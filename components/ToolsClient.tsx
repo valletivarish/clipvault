@@ -25,10 +25,16 @@ const tools = [
   { abbr: 'SHA', name: 'SHA-256 / SHA-512',     desc: 'SHA-256 and SHA-512 hashes',    slug: 'sha256',          category: 'Crypto' },
   { abbr: 'MAC', name: 'HMAC Generator',        desc: 'HMAC-SHA256 / HMAC-SHA512',     slug: 'hmac',            category: 'Crypto' },
   { abbr: 'HEX', name: 'Hex Encoder',           desc: 'Text to hex and hex to text',   slug: 'hex',             category: 'Crypto' },
+  { abbr: 'JAS', name: 'Jasypt Encryption',     desc: 'PBEWithMD5AndDES, Spring Boot', slug: 'jasypt',          category: 'Crypto' },
+  { abbr: 'F64', name: 'File to Base64',        desc: 'File to Base64 and back',       slug: 'file-base64',     category: 'Developer' },
+  { abbr: 'DDT', name: 'Date Difference',       desc: 'Days between two dates',        slug: 'date-diff',       category: 'Time & Date' },
+  { abbr: 'AGE', name: 'Age Calculator',        desc: 'Your exact age + birthday',     slug: 'age-calc',        category: 'Time & Date' },
+  { abbr: 'SIP', name: 'SIP Calculator',        desc: 'Mutual fund SIP returns',       slug: 'sip-calc',        category: 'Finance' },
+  { abbr: 'TIP', name: 'Tip Calculator',        desc: 'Tip + bill split',              slug: 'tip-calc',        category: 'Finance' },
 ];
 
 const categories = [
-  'All', 'Text', 'Developer', 'Security', 'Crypto', 'Images', 'Colors', 'Math', 'Time & Date', 'Generators',
+  'All', 'Text', 'Developer', 'Security', 'Crypto', 'Images', 'Colors', 'Finance', 'Time & Date', 'Generators',
 ];
 
 export default function ToolsClient() {

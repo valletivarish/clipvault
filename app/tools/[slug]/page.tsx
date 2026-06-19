@@ -26,6 +26,12 @@ import Md5Hash from '@/components/tools/Md5Hash';
 import Sha256Hash from '@/components/tools/Sha256Hash';
 import HmacHash from '@/components/tools/HmacHash';
 import HexEncoder from '@/components/tools/HexEncoder';
+import JasyptEncryptor from '@/components/tools/JasyptEncryptor';
+import FileBase64 from '@/components/tools/FileBase64';
+import DateDifference from '@/components/tools/DateDifference';
+import AgeCalculator from '@/components/tools/AgeCalculator';
+import SipCalculator from '@/components/tools/SipCalculator';
+import TipCalculator from '@/components/tools/TipCalculator';
 
 const COMPONENTS: Record<string, React.ComponentType> = {
   'qr': QrGenerator,
@@ -49,6 +55,12 @@ const COMPONENTS: Record<string, React.ComponentType> = {
   'sha256': Sha256Hash,
   'hmac': HmacHash,
   'hex': HexEncoder,
+  'jasypt': JasyptEncryptor,
+  'file-base64': FileBase64,
+  'date-diff': DateDifference,
+  'age-calc': AgeCalculator,
+  'sip-calc': SipCalculator,
+  'tip-calc': TipCalculator,
 };
 
 export async function generateStaticParams() {

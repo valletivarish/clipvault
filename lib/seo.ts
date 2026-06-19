@@ -34,6 +34,12 @@ export const TOOLS: ToolMeta[] = [
   { name: 'SHA-256 Hash Generator', slug: 'sha256', description: 'Generate SHA-256 and SHA-512 hashes using the Web Crypto API. Nothing leaves your browser.', category: 'Crypto', keywords: ['sha256 generator online', 'sha-256 hash', 'sha512 online'] },
   { name: 'HMAC Generator', slug: 'hmac', description: 'Generate HMAC-SHA256 and HMAC-SHA512 signatures with a secret key. Uses Web Crypto API.', category: 'Crypto', keywords: ['hmac generator online', 'hmac sha256', 'hmac sha512'] },
   { name: 'Hex Encoder / Decoder', slug: 'hex', description: 'Encode text to hexadecimal and decode hex back to text. Pure client-side.', category: 'Crypto', keywords: ['hex encoder online', 'hex decoder', 'text to hex'] },
+  { name: 'Jasypt Encryption', slug: 'jasypt', description: 'Encrypt and decrypt with Jasypt-compatible PBEWithMD5AndDES. Test your Spring Boot configs.', category: 'Crypto', keywords: ['jasypt encryption online', 'jasypt decrypt', 'pbe md5 des'] },
+  { name: 'File to Base64', slug: 'file-base64', description: 'Convert any file to Base64 and decode Base64 back to a downloadable file. No upload required.', category: 'Developer', keywords: ['file to base64', 'base64 to file', 'base64 encoder file'] },
+  { name: 'Date Difference', slug: 'date-diff', description: 'Calculate the exact difference between two dates in days, weeks, months, and years.', category: 'Time & Date', keywords: ['date difference calculator', 'days between dates', 'date calculator'] },
+  { name: 'Age Calculator', slug: 'age-calc', description: 'Calculate your exact age in years, months, and days. Find your next birthday countdown.', category: 'Time & Date', keywords: ['age calculator', 'how old am i', 'birthday calculator'] },
+  { name: 'SIP Calculator', slug: 'sip-calc', description: 'Calculate SIP returns with monthly investment, annual rate, and investment period.', category: 'Finance', keywords: ['sip calculator', 'systematic investment plan', 'mutual fund sip'] },
+  { name: 'Tip Calculator', slug: 'tip-calc', description: 'Calculate tip amount and split the bill among multiple people. Quick preset percentages.', category: 'Finance', keywords: ['tip calculator', 'bill splitter', 'gratuity calculator'] },
 ]
 
 // Build Next.js Metadata object for a page

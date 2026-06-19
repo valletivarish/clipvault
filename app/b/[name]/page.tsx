@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 
@@ -40,6 +40,27 @@ export default function BoardPage() {
   const [files, setFiles] = useState<FileSlot[]>(INITIAL_FILES);
   const [expiry, setExpiry] = useState<ExpiryValue>('24h');
   const [copied, setCopied] = useState(false);
+  const wsRef = useRef<WebSocket | null>(null);
+  const [connectedCount, setConnectedCount] = useState(1);
+  const MAX_CONNECTIONS = 5;
+
+  useEffect(() => {
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL ?? 'ws://localhost:3001';
+    const ws = new WebSocket(`${wsUrl}?board=${encodeURIComponent(boardName)}`);
+    wsRef.current = ws;
+
+    ws.onmessage = (e) => {
+      try {
+        const msg = JSON.parse(e.data) as { type: string; text?: string; count?: number };
+        if (msg.type === 'text' && msg.text !== undefined) setText(msg.text);
+        if (msg.type === 'connected' && msg.count !== undefined) setConnectedCount(msg.count);
+      } catch {}
+    };
+
+    ws.onerror = () => {};
+
+    return () => { ws.close(); };
+  }, [boardName]);
 
   const copyLink = () => {
     navigator.clipboard.writeText(`https://clipvault.vercel.app/b/${boardName}`);
@@ -84,7 +105,7 @@ export default function BoardPage() {
             <div className="flex items-center gap-2 mb-[6px]">
               <div className="flex items-center gap-1 text-[10px] font-medium px-2 py-[3px] rounded-[5px] bg-ok/[0.06] text-ok border border-ok/[0.15]">
                 <div className="w-[5px] h-[5px] rounded-full bg-ok animate-pulse" />
-                2 connected
+                {connectedCount}/{MAX_CONNECTIONS} connected
               </div>
               <div className="bg-s2 text-t3 border border-white/[0.06] text-[10px] px-2 py-[3px] rounded-[5px] font-medium">
                 Free board
@@ -133,7 +154,13 @@ export default function BoardPage() {
               </div>
               <textarea
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={(e) => {
+                const val = e.target.value;
+                setText(val);
+                if (wsRef.current?.readyState === WebSocket.OPEN) {
+                  wsRef.current.send(JSON.stringify({ type: 'text', text: val }));
+                }
+              }}
                 placeholder="Start typing - changes sync to all connected devices instantly"
                 aria-label="Shared board text"
                 className="w-full bg-transparent outline-none resize-none text-t2 text-[13px] leading-relaxed pr-16 min-h-[80px]"
