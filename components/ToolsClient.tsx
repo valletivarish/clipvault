@@ -54,19 +54,22 @@ export default function ToolsClient() {
 
   return (
     <>
-      <header className="px-5 sm:px-7 py-8 border-b border-white/[0.06]">
-        <div className="text-[10px] font-semibold text-t3 uppercase tracking-[0.1em] mb-[6px]">
-          Free tools
+      <header className="border-b border-white/[0.06] py-8">
+        <div className="mx-auto w-full max-w-5xl px-5 sm:px-7">
+          <div className="text-[10px] font-semibold text-t3 uppercase tracking-[0.1em] mb-[6px]">
+            Free tools
+          </div>
+          <h1 className="font-display text-[26px] sm:text-[30px] leading-[1.2] tracking-[-0.04em] mb-2">
+            100+ browser tools
+          </h1>
+          <p className="text-sm text-t2">
+            All tools run client-side. Nothing is uploaded.
+          </p>
         </div>
-        <h1 className="font-display text-[26px] sm:text-[30px] leading-[1.2] tracking-[-0.04em] mb-2">
-          100+ browser tools
-        </h1>
-        <p className="text-sm text-t2">
-          All tools run client-side. Nothing is uploaded.
-        </p>
       </header>
 
-      <section className="px-5 sm:px-7 py-6 flex-1">
+      <section className="py-6 flex-1">
+        <div className="mx-auto w-full max-w-5xl px-5 sm:px-7">
         <div
           className="flex gap-[5px] flex-wrap mb-6"
           role="tablist"
@@ -103,6 +106,7 @@ export default function ToolsClient() {
               <div className="text-[11px] text-t3">{tool.desc}</div>
             </Link>
           ))}
+        </div>
         </div>
       </section>
     </>
