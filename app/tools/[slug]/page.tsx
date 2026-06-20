@@ -40,6 +40,13 @@ import CronParser from '@/components/tools/CronParser';
 import CssUnits from '@/components/tools/CssUnits';
 import RegexTester from '@/components/tools/RegexTester';
 import DiffChecker from '@/components/tools/DiffChecker';
+import JsonToCsv from '@/components/tools/JsonToCsv';
+import XmlFormatter from '@/components/tools/XmlFormatter';
+import CodeMinifier from '@/components/tools/CodeMinifier';
+import UnitConverter from '@/components/tools/UnitConverter';
+import ImageResize from '@/components/tools/ImageResize';
+import PasswordStrength from '@/components/tools/PasswordStrength';
+import PdfMerge from '@/components/tools/PdfMerge';
 
 const COMPONENTS: Record<string, React.ComponentType> = {
   'qr': QrGenerator,
@@ -77,6 +84,13 @@ const COMPONENTS: Record<string, React.ComponentType> = {
   'css-units': CssUnits,
   'regex-tester': RegexTester,
   'text-diff': DiffChecker,
+  'json-to-csv': JsonToCsv,
+  'xml-formatter': XmlFormatter,
+  'code-minifier': CodeMinifier,
+  'unit-converter': UnitConverter,
+  'image-resize': ImageResize,
+  'password-strength': PasswordStrength,
+  'pdf-merge': PdfMerge,
 };
 
 export async function generateStaticParams() {

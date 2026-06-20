@@ -38,11 +38,18 @@ const tools = [
   { abbr: 'CRN', name: 'Cron Parser',           desc: 'Explain cron expressions',      slug: 'cron-parser',     category: 'Developer' },
   { abbr: 'CSS', name: 'CSS Unit Converter',    desc: 'px rem em vw vh pt pc',         slug: 'css-units',       category: 'Developer' },
   { abbr: 'REX', name: 'Regex Tester',          desc: 'Test regex with highlighting',  slug: 'regex-tester',    category: 'Developer' },
-  { abbr: 'DIF', name: 'Text Diff Checker',     desc: 'Compare two texts line by line',slug: 'text-diff',       category: 'Text' },
+  { abbr: 'DIF', name: 'Text Diff Checker',       desc: 'Compare two texts line by line',  slug: 'text-diff',          category: 'Text' },
+  { abbr: 'J2C', name: 'JSON to CSV',             desc: 'Convert JSON arrays to CSV',       slug: 'json-to-csv',        category: 'Developer' },
+  { abbr: 'XML', name: 'XML Formatter',           desc: 'Format & validate XML',            slug: 'xml-formatter',      category: 'Developer' },
+  { abbr: 'MIN', name: 'Code Minifier',           desc: 'Minify HTML / CSS / JS',           slug: 'code-minifier',      category: 'Developer' },
+  { abbr: 'UNT', name: 'Unit Converter',          desc: 'Temp, length, weight, speed',      slug: 'unit-converter',     category: 'Developer' },
+  { abbr: 'RSZ', name: 'Image Resize',            desc: 'Resize images in browser',         slug: 'image-resize',       category: 'Images' },
+  { abbr: 'PWS', name: 'Password Strength',       desc: 'Analyse password strength',        slug: 'password-strength',  category: 'Encryption' },
+  { abbr: 'PDF', name: 'PDF Merge',               desc: 'Merge multiple PDFs into one',     slug: 'pdf-merge',          category: 'PDF' },
 ];
 
 const categories = [
-  'All', 'Text', 'Encryption', 'Developer', 'Images', 'Colors', 'Date & Time', 'Finance',
+  'All', 'Text', 'Encryption', 'Developer', 'Images', 'Colors', 'Date & Time', 'Finance', 'PDF',
 ];
 
 export default function ToolsClient() {
