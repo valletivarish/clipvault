@@ -31,6 +31,14 @@ const tools = [
   { abbr: 'AGE', name: 'Age Calculator',        desc: 'Your exact age + birthday',     slug: 'age-calc',        category: 'Time & Date' },
   { abbr: 'SIP', name: 'SIP Calculator',        desc: 'Mutual fund SIP returns',       slug: 'sip-calc',        category: 'Finance' },
   { abbr: 'TIP', name: 'Tip Calculator',        desc: 'Tip + bill split',              slug: 'tip-calc',        category: 'Finance' },
+  { abbr: 'JWT', name: 'JWT Decoder',           desc: 'Decode + inspect JWT tokens',   slug: 'jwt-decoder',     category: 'Security' },
+  { abbr: 'BIN', name: 'Number Base Converter', desc: 'Binary / Octal / Hex / Dec',    slug: 'number-base',     category: 'Developer' },
+  { abbr: 'HTM', name: 'HTML Entities',         desc: 'Encode & decode HTML entities', slug: 'html-entities',   category: 'Developer' },
+  { abbr: 'STR', name: 'String Case Converter', desc: 'camelCase snake_case kebab...',  slug: 'string-case',     category: 'Text' },
+  { abbr: 'CRN', name: 'Cron Parser',           desc: 'Explain cron expressions',      slug: 'cron-parser',     category: 'Developer' },
+  { abbr: 'CSS', name: 'CSS Unit Converter',    desc: 'px rem em vw vh pt pc',         slug: 'css-units',       category: 'Developer' },
+  { abbr: 'REX', name: 'Regex Tester',          desc: 'Test regex with highlighting',  slug: 'regex-tester',    category: 'Developer' },
+  { abbr: 'DIF', name: 'Text Diff Checker',     desc: 'Compare two texts line by line',slug: 'text-diff',       category: 'Developer' },
 ];
 
 const categories = [

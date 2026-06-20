@@ -32,6 +32,14 @@ import DateDifference from '@/components/tools/DateDifference';
 import AgeCalculator from '@/components/tools/AgeCalculator';
 import SipCalculator from '@/components/tools/SipCalculator';
 import TipCalculator from '@/components/tools/TipCalculator';
+import JwtDecoder from '@/components/tools/JwtDecoder';
+import NumberBase from '@/components/tools/NumberBase';
+import HtmlEntities from '@/components/tools/HtmlEntities';
+import StringCase from '@/components/tools/StringCase';
+import CronParser from '@/components/tools/CronParser';
+import CssUnits from '@/components/tools/CssUnits';
+import RegexTester from '@/components/tools/RegexTester';
+import DiffChecker from '@/components/tools/DiffChecker';
 
 const COMPONENTS: Record<string, React.ComponentType> = {
   'qr': QrGenerator,
@@ -61,6 +69,14 @@ const COMPONENTS: Record<string, React.ComponentType> = {
   'age-calc': AgeCalculator,
   'sip-calc': SipCalculator,
   'tip-calc': TipCalculator,
+  'jwt-decoder': JwtDecoder,
+  'number-base': NumberBase,
+  'html-entities': HtmlEntities,
+  'string-case': StringCase,
+  'cron-parser': CronParser,
+  'css-units': CssUnits,
+  'regex-tester': RegexTester,
+  'text-diff': DiffChecker,
 };
 
 export async function generateStaticParams() {
