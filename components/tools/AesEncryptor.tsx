@@ -3,13 +3,33 @@
 import { useState } from 'react';
 import CryptoJS from 'crypto-js';
 
+function padKey(key: string, bits: 128 | 192 | 256): string {
+  const len = bits / 8;
+  if (key.length >= len) return key.slice(0, len);
+  return key.padEnd(len, '0');
+}
+
 export default function AesEncryptor() {
   const [plaintext, setPlaintext] = useState('');
   const [ciphertext, setCiphertext] = useState('');
   const [secretKey, setSecretKey] = useState('');
+  const [iv, setIv] = useState('');
   const [mode, setMode] = useState<'ECB' | 'CBC'>('ECB');
   const [keySize, setKeySize] = useState<128 | 192 | 256>(256);
   const [error, setError] = useState('');
+
+  const buildOptions = () => {
+    const keyWA = CryptoJS.enc.Utf8.parse(padKey(secretKey, keySize));
+    const opts: Record<string, unknown> = {
+      mode: mode === 'CBC' ? CryptoJS.mode.CBC : CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.Pkcs7,
+    };
+    if (mode === 'CBC') {
+      const ivStr = iv.trim() ? iv.slice(0, 16).padEnd(16, '0') : '\0'.repeat(16);
+      opts.iv = CryptoJS.enc.Utf8.parse(ivStr);
+    }
+    return { keyWA, opts };
+  };
 
   const handleEncrypt = () => {
     setError('');
@@ -17,11 +37,11 @@ export default function AesEncryptor() {
       setError('Please enter both plaintext and secret key');
       return;
     }
-
     try {
-      const encrypted = CryptoJS.AES.encrypt(plaintext, secretKey).toString();
-      setCiphertext(encrypted);
-    } catch (err) {
+      const { keyWA, opts } = buildOptions();
+      const encrypted = CryptoJS.AES.encrypt(plaintext, keyWA, opts);
+      setCiphertext(encrypted.toString());
+    } catch {
       setError('Encryption failed');
     }
   };
@@ -32,18 +52,16 @@ export default function AesEncryptor() {
       setError('Please enter both ciphertext and secret key');
       return;
     }
-
     try {
-      const decrypted = CryptoJS.AES.decrypt(ciphertext, secretKey).toString(
-        CryptoJS.enc.Utf8
-      );
+      const { keyWA, opts } = buildOptions();
+      const decrypted = CryptoJS.AES.decrypt(ciphertext, keyWA, opts).toString(CryptoJS.enc.Utf8);
       if (!decrypted) {
-        setError('Decryption failed - invalid key or corrupted data');
+        setError('Decryption failed - wrong key, IV, or corrupted data');
         return;
       }
       setPlaintext(decrypted);
-    } catch (err) {
-      setError('Decryption failed - invalid key or corrupted data');
+    } catch {
+      setError('Decryption failed - wrong key, IV, or corrupted data');
     }
   };
 
@@ -57,23 +75,19 @@ export default function AesEncryptor() {
 
       <div className="space-y-4 mb-6">
         <div>
-          <label className="block text-sm font-medium text-t2 mb-2">
-            Secret Key
-          </label>
+          <label className="block text-sm font-medium text-t2 mb-2">Secret Key</label>
           <input
             type="password"
             value={secretKey}
             onChange={(e) => setSecretKey(e.target.value)}
-            placeholder="Enter secret key"
+            placeholder={`Enter secret key (auto-padded to ${keySize / 8} bytes)`}
             className="w-full bg-s2 border border-white/10 rounded-[7px] px-3 py-2 text-t1 text-sm font-mono outline-none focus:border-ac/40 transition-colors"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-t2 mb-2">
-              Mode
-            </label>
+            <label className="block text-sm font-medium text-t2 mb-2">Mode</label>
             <select
               value={mode}
               onChange={(e) => setMode(e.target.value as 'ECB' | 'CBC')}
@@ -85,9 +99,7 @@ export default function AesEncryptor() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-t2 mb-2">
-              Key Size
-            </label>
+            <label className="block text-sm font-medium text-t2 mb-2">Key Size</label>
             <select
               value={keySize}
               onChange={(e) => setKeySize(parseInt(e.target.value) as 128 | 192 | 256)}
@@ -99,13 +111,27 @@ export default function AesEncryptor() {
             </select>
           </div>
         </div>
+
+        {mode === 'CBC' && (
+          <div>
+            <label className="block text-sm font-medium text-t2 mb-2">
+              IV <span className="text-t3 font-normal">(optional - 16 chars, padded with zeros if shorter)</span>
+            </label>
+            <input
+              type="text"
+              value={iv}
+              onChange={(e) => setIv(e.target.value)}
+              placeholder="Leave blank to use zero IV"
+              maxLength={16}
+              className="w-full bg-s2 border border-white/10 rounded-[7px] px-3 py-2 text-t1 text-sm font-mono outline-none focus:border-ac/40 transition-colors"
+            />
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-6 mb-6">
         <div>
-          <label className="block text-sm font-medium text-t2 mb-2">
-            Plaintext
-          </label>
+          <label className="block text-sm font-medium text-t2 mb-2">Plaintext</label>
           <textarea
             value={plaintext}
             onChange={(e) => setPlaintext(e.target.value)}
@@ -123,9 +149,7 @@ export default function AesEncryptor() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-t2 mb-2">
-            Ciphertext
-          </label>
+          <label className="block text-sm font-medium text-t2 mb-2">Ciphertext</label>
           <textarea
             value={ciphertext}
             onChange={(e) => setCiphertext(e.target.value)}
