@@ -71,17 +71,18 @@ export default function HomeToolsSection() {
           ))}
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {filtered.map((tool) => (
             <Link
               key={tool.slug}
               href={`/tools/${tool.slug}`}
-              className="flex items-center gap-3 px-4 py-3 bg-s1 border border-white/[0.06] rounded-[10px] hover:border-[var(--ac-glow)] hover:bg-[var(--ac-bg)] transition-all group"
+              className="p-4 bg-s2 border border-white/10 rounded-xl hover:border-[var(--ac-glow)] hover:bg-[var(--ac-bg)] transition-all group"
             >
-              <div className="font-mono text-[11px] font-bold text-t3 w-8 shrink-0 group-hover:text-ac transition-colors">
+              <span className="inline-block font-mono text-[10px] font-bold text-t3 bg-s3 px-[7px] py-[2px] rounded mb-3 group-hover:text-ac transition-colors">
                 {tool.abbr}
-              </div>
-              <div className="text-[13px] font-medium text-t1">{tool.name}</div>
+              </span>
+              <div className="text-[13px] font-semibold text-t1 mb-1 leading-snug">{tool.name}</div>
+              <div className="text-[11px] text-t3 leading-snug">{tool.desc}</div>
             </Link>
           ))}
         </div>
