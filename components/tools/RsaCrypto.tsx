@@ -6,6 +6,7 @@ interface KeyPair {
   publicKey: CryptoKey;
   privateKey: CryptoKey;
   publicKeyPem: string;
+  privateKeyPem: string;
 }
 
 export default function RsaCrypto() {
@@ -41,10 +42,15 @@ export default function RsaCrypto() {
       const pubB64 = btoa(String.fromCharCode(...new Uint8Array(pubRaw)));
       const pubPem = `-----BEGIN PUBLIC KEY-----\n${pubB64.match(/.{1,64}/g)?.join('\n') || pubB64}\n-----END PUBLIC KEY-----`;
 
+      const privRaw = await crypto.subtle.exportKey('pkcs8', pair.privateKey);
+      const privB64 = btoa(String.fromCharCode(...new Uint8Array(privRaw)));
+      const privPem = `-----BEGIN PRIVATE KEY-----\n${privB64.match(/.{1,64}/g)?.join('\n') || privB64}\n-----END PRIVATE KEY-----`;
+
       setKeyPair({
         publicKey: pair.publicKey,
         privateKey: pair.privateKey,
         publicKeyPem: pubPem,
+        privateKeyPem: privPem,
       });
       setCiphertext('');
       setPlaintext('');
@@ -145,17 +151,23 @@ export default function RsaCrypto() {
             {/* Private Key */}
             <div>
               <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-2">
-                PRIVATE KEY (READONLY)
+                PRIVATE KEY (PKCS8)
               </label>
               <div className="flex gap-2">
                 <textarea
-                  value="[Private key stored in memory - cannot be exported for security]"
+                  value={keyPair.privateKeyPem}
                   readOnly
-                  className="flex-1 bg-[#18181C] border border-white/10 rounded-[7px] px-3 py-2 text-[#A1A1AA] text-sm font-mono outline-none resize-none h-16"
+                  className="flex-1 bg-[#18181C] border border-white/10 rounded-[7px] px-3 py-2 text-[#FAFAFA] text-sm font-mono outline-none resize-none h-24"
                 />
+                <button
+                  onClick={() => copyToClipboard(keyPair.privateKeyPem)}
+                  className="border border-white/10 text-[#A1A1AA] px-3 py-2 rounded-[7px] text-sm hover:border-white/20 hover:text-[#FAFAFA] transition-colors font-semibold whitespace-nowrap"
+                >
+                  {copied ? 'COPIED' : 'COPY'}
+                </button>
               </div>
-              <p className="text-[10px] text-[#52525B] mt-1">
-                Private key remains in browser memory for security
+              <p className="text-[10px] text-[#F59E0B] mt-1">
+                Save this key to decrypt data in future sessions. Keep it secret.
               </p>
             </div>
           </div>
