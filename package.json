@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "deploy": "npx vercel --prod"
+    "deploy": "bash deploy.sh"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1072.0",
