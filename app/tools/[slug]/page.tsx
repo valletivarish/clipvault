@@ -47,6 +47,8 @@ import UnitConverter from '@/components/tools/UnitConverter';
 import ImageResize from '@/components/tools/ImageResize';
 import PasswordStrength from '@/components/tools/PasswordStrength';
 import PdfMerge from '@/components/tools/PdfMerge';
+import WordViewer from '@/components/tools/WordViewer';
+import ExcelViewer from '@/components/tools/ExcelViewer';
 
 const COMPONENTS: Record<string, React.ComponentType> = {
   'qr': QrGenerator,
@@ -91,6 +93,8 @@ const COMPONENTS: Record<string, React.ComponentType> = {
   'image-resize': ImageResize,
   'password-strength': PasswordStrength,
   'pdf-merge': PdfMerge,
+  'word-viewer': WordViewer,
+  'excel-viewer': ExcelViewer,
 };
 
 export async function generateStaticParams() {

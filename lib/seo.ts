@@ -55,6 +55,8 @@ export const TOOLS: ToolMeta[] = [
   { name: 'Image Resize', slug: 'image-resize', description: 'Resize images in your browser with aspect ratio lock. Export as JPG, PNG, or WEBP with quality control.', category: 'Images', keywords: ['image resize online', 'resize image free', 'image resizer', 'compress resize image'] },
   { name: 'Password Strength Checker', slug: 'password-strength', description: 'Analyse password strength instantly with a detailed checklist. Get suggestions to make it stronger.', category: 'Encryption', keywords: ['password strength checker', 'password strength meter', 'how strong is my password'] },
   { name: 'PDF Merge', slug: 'pdf-merge', description: 'Merge multiple PDF files into one in your browser. Reorder pages, no upload required.', category: 'PDF', keywords: ['merge pdf online', 'combine pdf files', 'pdf merger free', 'join pdf'] },
+  { name: 'Word Viewer', slug: 'word-viewer', description: 'Open and read .docx Word documents in your browser. No Microsoft Office needed. Export as HTML.', category: 'Documents', keywords: ['word viewer online', 'docx viewer', 'open word file online', 'view docx without word'] },
+  { name: 'Excel Viewer', slug: 'excel-viewer', description: 'Open and view .xlsx, .xls, and .csv spreadsheets in your browser. Download as CSV or XLSX.', category: 'Documents', keywords: ['excel viewer online', 'xlsx viewer', 'open excel file online', 'view spreadsheet online'] },
 ]
 
 // Build Next.js Metadata object for a page

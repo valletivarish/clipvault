@@ -46,10 +46,12 @@ const tools = [
   { abbr: 'RSZ', name: 'Image Resize',            desc: 'Resize images in browser',         slug: 'image-resize',       category: 'Images' },
   { abbr: 'PWS', name: 'Password Strength',       desc: 'Analyse password strength',        slug: 'password-strength',  category: 'Encryption' },
   { abbr: 'PDF', name: 'PDF Merge',               desc: 'Merge multiple PDFs into one',     slug: 'pdf-merge',          category: 'PDF' },
+  { abbr: 'DOC', name: 'Word Viewer',             desc: 'View .docx without Microsoft Word', slug: 'word-viewer',        category: 'Documents' },
+  { abbr: 'XLS', name: 'Excel Viewer',            desc: 'View .xlsx / .xls / .csv files',   slug: 'excel-viewer',       category: 'Documents' },
 ];
 
 const categories = [
-  'All', 'Text', 'Encryption', 'Developer', 'Images', 'Colors', 'Date & Time', 'Finance', 'PDF',
+  'All', 'Text', 'Encryption', 'Developer', 'Images', 'Colors', 'Date & Time', 'Finance', 'PDF', 'Documents',
 ];
 
 export default function ToolsClient() {
