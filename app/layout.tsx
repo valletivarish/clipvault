@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
-import { Syne, Inter, JetBrains_Mono } from 'next/font/google';
+import { Space_Grotesk, DM_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
-const syne = Syne({
-  weight: '800',
+const spaceGrotesk = Space_Grotesk({
+  weight: ['500', '600', '700'],
   subsets: ['latin'],
   variable: '--font-syne',
 });
 
-const inter = Inter({
+const dmSans = DM_Sans({
   weight: ['400', '500'],
   subsets: ['latin'],
   variable: '--font-inter',
@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
+      className={`${spaceGrotesk.variable} ${dmSans.variable} ${jetbrainsMono.variable} antialiased`}
     >
       <body className="min-h-screen flex flex-col bg-bg text-t1">
         {children}
