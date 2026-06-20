@@ -44,7 +44,7 @@ const tools = [
 const categories = ['All', 'Text', 'Encryption', 'Developer', 'Images', 'Colors', 'Date & Time', 'Finance'];
 
 export default function HomeToolsSection() {
-  const [active, setActive] = useState('All');
+  const [active, setActive] = useState('Developer');
 
   const filtered = active === 'All' ? tools : tools.filter(t => t.category === active);
 
@@ -71,18 +71,17 @@ export default function HomeToolsSection() {
           ))}
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(142px,1fr))] gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-2">
           {filtered.map((tool) => (
             <Link
               key={tool.slug}
               href={`/tools/${tool.slug}`}
-              className="p-[14px] bg-s1 border border-white/[0.06] rounded-[10px] hover:border-[var(--ac-glow)] hover:bg-[var(--ac-bg)] transition-all group"
+              className="flex items-center gap-3 px-4 py-3 bg-s1 border border-white/[0.06] rounded-[10px] hover:border-[var(--ac-glow)] hover:bg-[var(--ac-bg)] transition-all group"
             >
-              <div className="font-mono text-[13px] font-semibold text-t3 mb-2 group-hover:text-ac transition-colors">
+              <div className="font-mono text-[11px] font-bold text-t3 w-8 shrink-0 group-hover:text-ac transition-colors">
                 {tool.abbr}
               </div>
-              <div className="text-xs font-medium text-t1 mb-[2px]">{tool.name}</div>
-              <div className="text-[10px] text-t3">{tool.desc}</div>
+              <div className="text-[13px] font-medium text-t1">{tool.name}</div>
             </Link>
           ))}
         </div>
