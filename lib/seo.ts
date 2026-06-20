@@ -1,5 +1,5 @@
 // Site-wide constants
-export const SITE_URL = 'https://clipvault.vercel.app'
+export const SITE_URL = 'https://clipvault-tools.vercel.app'
 export const SITE_NAME = 'ClipVault'
 export const SITE_DESCRIPTION = 'Share text and files instantly across devices. Free real-time clipboard boards. No account required.'
 
