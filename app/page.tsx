@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Nav from '@/components/Nav';
 import HeroSection from '@/components/HeroSection';
-import BoardPreview from '@/components/BoardPreview';
 import Footer from '@/components/Footer';
 import JsonLd from '@/components/JsonLd';
 import { buildMetadata, webAppJsonLd } from '@/lib/seo';
@@ -36,8 +35,6 @@ export default function Home() {
       <Nav />
 
       <HeroSection />
-
-      <BoardPreview />
 
       {/* Ad strip */}
       <div className="px-5 sm:px-7 py-[9px] border-y border-white/[0.06] text-center text-[10px] text-t3 tracking-[0.04em]">
