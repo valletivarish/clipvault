@@ -63,7 +63,7 @@ export default function BoardPage() {
   }, [boardName]);
 
   const copyLink = () => {
-    navigator.clipboard.writeText(`https://clipvault.vercel.app/b/${boardName}`);
+    navigator.clipboard.writeText(`https://clipvault-tools.vercel.app/b/${boardName}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
@@ -112,7 +112,7 @@ export default function BoardPage() {
               </div>
             </div>
             <div className="text-[10px] text-t3 font-mono">
-              clipvault.vercel.app/b/<span className="text-t2">{boardName}</span>
+              clipvault-tools.vercel.app/b/<span className="text-t2">{boardName}</span>
             </div>
           </div>
 
