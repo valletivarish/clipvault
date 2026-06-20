@@ -3,24 +3,14 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const ADJECTIVES = [
-  'swift', 'bright', 'lucky', 'calm', 'brave', 'cool', 'wild', 'keen', 'bold', 'pure',
-  'quiet', 'sharp', 'warm', 'vast', 'free', 'sage', 'deep', 'soft', 'fine', 'true',
-];
-const ANIMALS = [
-  'tiger', 'wolf', 'eagle', 'bear', 'fox', 'hawk', 'lynx', 'deer', 'owl', 'lion',
-  'crane', 'raven', 'puma', 'bison', 'viper', 'finch', 'mink', 'stoat', 'hare', 'kite',
-];
+const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 function generateBoardName(): string {
-  const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
-  const animal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
-  const number = Math.floor(Math.random() * 90) + 10;
-  return `${adj}-${animal}-${number}`;
+  return Array.from({ length: 6 }, () => CHARS[Math.floor(Math.random() * CHARS.length)]).join('');
 }
 
 export default function BoardGenerator() {
-  const [boardName, setBoardName] = useState<string>('swift-tiger-42');
+  const [boardName, setBoardName] = useState<string>(() => generateBoardName());
   const [passwordEnabled, setPasswordEnabled] = useState<boolean>(false);
 
   return (
