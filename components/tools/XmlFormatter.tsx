@@ -13,7 +13,14 @@ function formatXml(xml: string): string {
   for (const token of tokens) {
     if (token.startsWith('</')) indent = Math.max(0, indent - 1);
     lines.push('  '.repeat(indent) + token);
-    if (token.startsWith('<') && !token.startsWith('</') && !token.endsWith('/>') && !token.startsWith('<?') && !token.startsWith('<!')) {
+    if (
+      token.startsWith('<') &&
+      !token.startsWith('</') &&
+      !token.endsWith('/>') &&
+      !token.startsWith('<?') &&
+      !token.startsWith('<!') &&
+      !token.includes('</')
+    ) {
       indent++;
     }
   }
