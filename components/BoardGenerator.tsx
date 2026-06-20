@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -10,8 +10,12 @@ function generateBoardName(): string {
 }
 
 export default function BoardGenerator() {
-  const [boardName, setBoardName] = useState<string>(() => generateBoardName());
+  const [boardName, setBoardName] = useState<string>('');
   const [passwordEnabled, setPasswordEnabled] = useState<boolean>(false);
+
+  useEffect(() => {
+    setBoardName(generateBoardName());
+  }, []);
 
   return (
     <div className="mx-auto w-full max-w-[400px]">
