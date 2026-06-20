@@ -20,8 +20,6 @@ export default function QrGenerator() {
       if (canvasRef.current) {
         await QRCode.toCanvas(canvasRef.current, input, {
           errorCorrectionLevel: "H",
-          type: "image/png",
-          quality: 0.95,
           margin: 1,
           width: 200,
           color: {
