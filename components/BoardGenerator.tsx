@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -10,12 +11,24 @@ function generateBoardName(): string {
 }
 
 export default function BoardGenerator() {
+  const router = useRouter();
   const [boardName, setBoardName] = useState<string>('');
   const [passwordEnabled, setPasswordEnabled] = useState<boolean>(false);
+  const [joining, setJoining] = useState(false);
+  const [joinInput, setJoinInput] = useState('');
 
   useEffect(() => {
     setBoardName(generateBoardName());
   }, []);
+
+  const handleCreate = () => {
+    if (boardName) router.push(`/b/${boardName}`);
+  };
+
+  const handleJoin = () => {
+    const code = joinInput.trim().toUpperCase();
+    if (code) router.push(`/b/${code}`);
+  };
 
   return (
     <div className="mx-auto w-full max-w-[400px]">
@@ -71,13 +84,44 @@ export default function BoardGenerator() {
         )}
       </div>
 
+      {/* Join input (shown when joining) */}
+      {joining && (
+        <div className="mb-[10px] flex gap-2">
+          <input
+            autoFocus
+            value={joinInput}
+            onChange={(e) => setJoinInput(e.target.value.toUpperCase().slice(0, 8))}
+            onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
+            placeholder="Enter board code..."
+            className="flex-1 rounded-[7px] border border-white/10 bg-[#111115] px-3 py-[10px] font-mono text-[15px] text-[#FAFAFA] placeholder-[#52525B] outline-none focus:border-white/20"
+          />
+          <button
+            onClick={handleJoin}
+            disabled={!joinInput.trim()}
+            className="rounded-[7px] border border-white/10 px-4 py-[10px] text-[13px] text-[#A1A1AA] transition-colors hover:border-white/20 hover:text-[#FAFAFA] disabled:opacity-40"
+          >
+            Go
+          </button>
+        </div>
+      )}
+
       {/* Buttons Row */}
       <div className="flex gap-2">
-        <button className="flex-1 rounded-[7px] bg-[#F97316] py-[10px] text-[13px] font-semibold text-white transition-colors hover:bg-[#EA8C15] active:scale-[0.97]">
+        <button
+          onClick={handleCreate}
+          className="flex-1 rounded-[7px] bg-[#F97316] py-[10px] text-[13px] font-semibold text-white transition-colors hover:bg-[#EA8C15] active:scale-[0.97]"
+        >
           Create this board
         </button>
-        <button className="flex-1 rounded-[7px] border border-white/10 py-[10px] text-[13px] text-[#A1A1AA] transition-colors hover:border-white/20 hover:text-[#FAFAFA] active:scale-[0.97]">
-          Join existing
+        <button
+          onClick={() => { setJoining(!joining); setJoinInput(''); }}
+          className={`flex-1 rounded-[7px] border py-[10px] text-[13px] transition-colors active:scale-[0.97] ${
+            joining
+              ? 'border-white/20 text-[#FAFAFA]'
+              : 'border-white/10 text-[#A1A1AA] hover:border-white/20 hover:text-[#FAFAFA]'
+          }`}
+        >
+          {joining ? 'Cancel' : 'Join existing'}
         </button>
       </div>
     </div>
