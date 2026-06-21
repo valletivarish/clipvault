@@ -25,7 +25,7 @@ export default function HeroSection() {
           transition={{ duration: 0.45, ease, delay: 0.1 }}
           className="text-sm text-t2 max-w-[340px] mx-auto mb-9 leading-relaxed"
         >
-          Create a board and share the 6-digit code. Text syncs live across
+          Create a board with any name and share it. Text syncs live across
           every device. Drop any file and it appears everywhere instantly.
         </motion.p>
         <motion.div

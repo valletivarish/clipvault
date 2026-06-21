@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Board file uploads live under boards/<boardName>/<file>.
+    match /boards/{boardName}/{fileName} {
+      // Anyone with the link can download.
+      allow read: if true;
+      // Allow uploads up to 25 MB, and allow deletes (request.resource == null).
+      allow write: if request.resource == null
+        || request.resource.size < 25 * 1024 * 1024;
+    }
+
+    // Default deny anything outside the boards tree.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

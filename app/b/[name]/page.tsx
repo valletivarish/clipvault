@@ -1,11 +1,12 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import AdUnit from '@/components/AdUnit';
 import { db, storage } from '@/lib/firebase';
+import { slugifyBoardName } from '@/lib/board';
 import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 
@@ -52,7 +53,9 @@ function expiryMs(val: ExpiryValue): number | null {
 
 export default function BoardPage() {
   const params = useParams();
-  const boardName = (params?.name as string) || 'swift-tiger-42';
+  const router = useRouter();
+  const rawName = (params?.name as string) || '';
+  const boardName = slugifyBoardName(rawName);
 
   const [text, setText] = useState('');
   const [files, setFiles] = useState<FileSlot[]>([]);
@@ -75,20 +78,30 @@ export default function BoardPage() {
   const expiryTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const lastPushed = useRef('');
 
-  const boardRef = doc(db, 'boards', boardName);
+  const boardRef = boardName ? doc(db, 'boards', boardName) : null;
+
+  // Normalize the URL to the canonical slug (e.g. /b/My-Board -> /b/my-board).
+  useEffect(() => {
+    if (boardName && rawName && boardName !== rawName) {
+      router.replace(`/b/${boardName}`);
+    }
+  }, [boardName, rawName, router]);
 
   useEffect(() => {
+    if (!boardName) return;
     const stored = typeof window !== 'undefined' && sessionStorage.getItem(`unlock_${boardName}`);
     if (stored === '1') setUnlocked(true);
   }, [boardName]);
 
   const purgeFile = useCallback(async (slot: FileSlot, currentFiles: FileSlot[]) => {
+    if (!boardRef) return;
     const updated = currentFiles.filter((f) => f.id !== slot.id);
     try { await deleteObject(ref(storage, slot.storagePath)); } catch {}
     await updateDoc(boardRef, { files: updated }).catch(() => {});
   }, [boardName]);
 
   useEffect(() => {
+    if (!boardRef) return;
     setConnected(false);
     const timeout = setTimeout(() => setConnected(false), 8000);
     const unsub = onSnapshot(
@@ -132,6 +145,7 @@ export default function BoardPage() {
   }, [boardName]);
 
   const pushText = useCallback((val: string) => {
+    if (!boardRef) return;
     lastPushed.current = val;
     setSynced(false);
     if (textDebounce.current) clearTimeout(textDebounce.current);
@@ -153,6 +167,7 @@ export default function BoardPage() {
   };
 
   const handleSetPin = async () => {
+    if (!boardRef) return;
     if (pinInput.length < 4) { setPinError('Enter at least 4 digits'); return; }
     if (pinInput !== pinConfirm) { setPinError('PINs do not match'); return; }
     try {
@@ -182,6 +197,7 @@ export default function BoardPage() {
   };
 
   const handleRemovePin = async () => {
+    if (!boardRef) return;
     try {
       await setDoc(boardRef, { pin: null }, { merge: true });
       sessionStorage.removeItem(`unlock_${boardName}`);
@@ -194,7 +210,7 @@ export default function BoardPage() {
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isEditable) return;
+    if (!isEditable || !boardRef) return;
     const f = e.target.files?.[0];
     if (!f || files.length >= 3) return;
     e.target.value = '';
@@ -237,7 +253,7 @@ export default function BoardPage() {
   };
 
   const removeFile = async (slot: FileSlot) => {
-    if (!isEditable) return;
+    if (!isEditable || !boardRef) return;
     const updated = files.filter((f) => f.id !== slot.id);
     setFiles(updated);
     try { await deleteObject(ref(storage, slot.storagePath)); } catch {}
@@ -250,7 +266,7 @@ export default function BoardPage() {
   };
 
   const clearAll = async () => {
-    if (!isEditable) return;
+    if (!isEditable || !boardRef) return;
     for (const f of files) {
       try { await deleteObject(ref(storage, f.storagePath)); } catch {}
     }
@@ -282,6 +298,28 @@ export default function BoardPage() {
     ...files.slice(0, 3),
     ...Array(Math.max(0, 3 - files.length)).fill(null),
   ] as (FileSlot | null)[];
+
+  if (!boardName) {
+    return (
+      <div className="min-h-screen flex flex-col bg-bg text-t1">
+        <Nav />
+        <main className="flex-1 flex flex-col items-center justify-center px-5 text-center">
+          <div className="font-mono text-[12px] text-t3 mb-3 break-all">/b/{rawName}</div>
+          <h1 className="font-display text-[22px] mb-2">That board name is not valid</h1>
+          <p className="text-[13px] text-t2 max-w-[320px] mb-6 leading-relaxed">
+            Board names use 3 to 40 letters, numbers or hyphens. Pick a different name to continue.
+          </p>
+          <a
+            href="/"
+            className="rounded-[8px] bg-ac px-5 py-[10px] text-[13px] font-semibold text-white hover:bg-[#EA8C15] transition-colors"
+          >
+            Back to home
+          </a>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-bg text-t1">

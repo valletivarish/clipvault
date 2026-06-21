@@ -1,0 +1,44 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Anonymous, no-login collaborative boards at /boards/{boardName}.
+    // Public read so any board can be shared; public create/update with
+    // abuse caps; deletes are locked down.
+    match /boards/{boardName} {
+
+      // Anyone with the link can view a board.
+      allow read: if true;
+
+      // Shape and size guard for the resulting document on any write.
+      function validBoard(data) {
+        return data.keys().hasOnly(['text', 'pin', 'files', 'nextCleanupAt'])
+          && (!('text' in data) || (data.text is string && data.text.size() <= 65000))
+          && (!('pin' in data) || data.pin == null || (data.pin is string && data.pin.size() <= 8))
+          && (!('files' in data) || (data.files is list && data.files.size() <= 3))
+          && (!('nextCleanupAt' in data) || data.nextCleanupAt == null || data.nextCleanupAt is number);
+      }
+
+      // A new board must start as a valid, bounded document.
+      allow create: if validBoard(request.resource.data);
+
+      // Edits stay bounded. A board that has a PIN can only be written by a
+      // request that preserves the same PIN value, which blocks a non-holder
+      // from stripping or overwriting the PIN. Boards with no PIN stay open.
+      allow update: if validBoard(request.resource.data)
+        && (
+          resource.data.get('pin', null) == null
+          || request.resource.data.get('pin', null) == resource.data.pin
+        );
+
+      // No client deletes, so nobody can wipe someone else's board.
+      allow delete: if false;
+    }
+
+    // Default deny everything else.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
