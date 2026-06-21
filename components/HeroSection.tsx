@@ -25,8 +25,8 @@ export default function HeroSection() {
           transition={{ duration: 0.45, ease, delay: 0.1 }}
           className="text-sm text-t2 max-w-[340px] mx-auto mb-9 leading-relaxed"
         >
-          Open a board, share the name. Text syncs live across every device.
-          Drop any file - PDF, Excel, image, ZIP - it appears everywhere.
+          Create a board and share the 6-digit code. Text syncs live across
+          every device. Drop any file and it appears everywhere instantly.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 16 }}

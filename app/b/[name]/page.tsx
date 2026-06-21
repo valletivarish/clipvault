@@ -60,13 +60,27 @@ export default function BoardPage() {
   const [copied, setCopied] = useState(false);
   const [uploading, setUploading] = useState<Record<string, number>>({});
   const [synced, setSynced] = useState(true);
+  const [connected, setConnected] = useState(false);
+
+  const [boardPin, setBoardPin] = useState<string | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
+  const [pinDialog, setPinDialog] = useState<null | 'set' | 'unlock'>(null);
+  const [pinInput, setPinInput] = useState('');
+  const [pinConfirm, setPinConfirm] = useState('');
+  const [pinError, setPinError] = useState('');
+
+  const isEditable = !boardPin || unlocked;
 
   const textDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const expiryTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const lastPushed = useRef('');
-  const [connected, setConnected] = useState(false);
 
   const boardRef = doc(db, 'boards', boardName);
+
+  useEffect(() => {
+    const stored = typeof window !== 'undefined' && sessionStorage.getItem(`unlock_${boardName}`);
+    if (stored === '1') setUnlocked(true);
+  }, [boardName]);
 
   const purgeFile = useCallback(async (slot: FileSlot, currentFiles: FileSlot[]) => {
     const updated = currentFiles.filter((f) => f.id !== slot.id);
@@ -76,13 +90,15 @@ export default function BoardPage() {
 
   useEffect(() => {
     setConnected(false);
-    // If Firestore doesn't connect in 8s, stop showing "Connecting..."
     const timeout = setTimeout(() => setConnected(false), 8000);
     const unsub = onSnapshot(
       boardRef,
       (snap) => {
         const incoming = snap.exists() ? (snap.data().text ?? '') : '';
         if (incoming !== lastPushed.current) setText(incoming);
+
+        const pin: string | null = snap.exists() ? (snap.data().pin ?? null) : null;
+        setBoardPin(pin);
 
         const now = Date.now();
         const all: FileSlot[] = snap.exists() ? (snap.data().files ?? []) : [];
@@ -131,11 +147,54 @@ export default function BoardPage() {
   }, [boardName]);
 
   const handleTextChange = (val: string) => {
+    if (!isEditable) return;
     setText(val);
     pushText(val);
   };
 
+  const handleSetPin = async () => {
+    if (pinInput.length < 4) { setPinError('Enter at least 4 digits'); return; }
+    if (pinInput !== pinConfirm) { setPinError('PINs do not match'); return; }
+    try {
+      await setDoc(boardRef, { pin: pinInput }, { merge: true });
+      sessionStorage.setItem(`unlock_${boardName}`, '1');
+      setUnlocked(true);
+      setPinDialog(null);
+      setPinInput('');
+      setPinConfirm('');
+      setPinError('');
+    } catch (err) {
+      console.error('Set PIN error:', err);
+    }
+  };
+
+  const handleUnlock = () => {
+    if (pinInput === boardPin) {
+      sessionStorage.setItem(`unlock_${boardName}`, '1');
+      setUnlocked(true);
+      setPinDialog(null);
+      setPinInput('');
+      setPinError('');
+    } else {
+      setPinError('Incorrect PIN');
+      setPinInput('');
+    }
+  };
+
+  const handleRemovePin = async () => {
+    try {
+      await setDoc(boardRef, { pin: null }, { merge: true });
+      sessionStorage.removeItem(`unlock_${boardName}`);
+      setUnlocked(false);
+      setBoardPin(null);
+      setPinDialog(null);
+    } catch (err) {
+      console.error('Remove PIN error:', err);
+    }
+  };
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isEditable) return;
     const f = e.target.files?.[0];
     if (!f || files.length >= 3) return;
     e.target.value = '';
@@ -178,6 +237,7 @@ export default function BoardPage() {
   };
 
   const removeFile = async (slot: FileSlot) => {
+    if (!isEditable) return;
     const updated = files.filter((f) => f.id !== slot.id);
     setFiles(updated);
     try { await deleteObject(ref(storage, slot.storagePath)); } catch {}
@@ -190,6 +250,7 @@ export default function BoardPage() {
   };
 
   const clearAll = async () => {
+    if (!isEditable) return;
     for (const f of files) {
       try { await deleteObject(ref(storage, f.storagePath)); } catch {}
     }
@@ -202,6 +263,19 @@ export default function BoardPage() {
     navigator.clipboard.writeText(`https://clipvault-tools.vercel.app/b/${boardName}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  };
+
+  const openPinDialog = () => {
+    setPinInput('');
+    setPinConfirm('');
+    setPinError('');
+    if (!boardPin) {
+      setPinDialog('set');
+    } else if (!unlocked) {
+      setPinDialog('unlock');
+    } else {
+      handleRemovePin();
+    }
   };
 
   const displaySlots = [
@@ -219,7 +293,7 @@ export default function BoardPage() {
             <div className="font-mono text-[22px] font-semibold tracking-[-0.01em] mb-2">
               {boardName}
             </div>
-            <div className="flex items-center gap-2 mb-[6px]">
+            <div className="flex items-center gap-2 mb-[6px] flex-wrap">
               <div className={`flex items-center gap-1 text-[10px] font-medium px-2 py-[3px] rounded-[5px] border ${
                 connected
                   ? 'bg-ok/[0.06] text-ok border-ok/[0.15]'
@@ -231,13 +305,29 @@ export default function BoardPage() {
               <div className="bg-s2 text-t3 border border-white/[0.06] text-[10px] px-2 py-[3px] rounded-[5px] font-medium">
                 Free board
               </div>
+              {boardPin && (
+                <div className={`flex items-center gap-1 text-[10px] font-medium px-2 py-[3px] rounded-[5px] border ${
+                  unlocked
+                    ? 'bg-ok/[0.06] text-ok border-ok/[0.15]'
+                    : 'bg-danger/[0.06] text-danger border-danger/[0.15]'
+                }`}>
+                  <svg width="8" height="9" viewBox="0 0 8 9" fill="none" aria-hidden="true">
+                    <rect x="0.6" y="3.5" width="6.8" height="5" rx="1" stroke="currentColor" strokeWidth="1.1" fill="none"/>
+                    {unlocked
+                      ? <path d="M2 3.5V2.6A2 2 0 016 2.6" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+                      : <path d="M2 3.5V2.2A2 2 0 016 2.2v1.3" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+                    }
+                  </svg>
+                  {unlocked ? 'Protected' : 'Locked'}
+                </div>
+              )}
             </div>
             <div className="text-[10px] text-t3 font-mono">
               clipvault-tools.vercel.app/b/<span className="text-t2">{boardName}</span>
             </div>
           </div>
 
-          <div className="flex gap-[6px]">
+          <div className="flex gap-[6px] flex-wrap justify-end">
             <button
               onClick={copyLink}
               className="px-[11px] py-[6px] bg-s2 border border-white/10 rounded-[7px] text-t2 text-[11px] font-medium hover:border-[var(--ac-glow)] transition-all"
@@ -245,8 +335,19 @@ export default function BoardPage() {
               {copied ? 'Copied' : 'Copy link'}
             </button>
             <button
+              onClick={openPinDialog}
+              className={`px-[11px] py-[6px] bg-s2 border rounded-[7px] text-[11px] font-medium transition-all ${
+                boardPin && !unlocked
+                  ? 'border-danger/20 text-danger hover:border-danger/40'
+                  : 'border-white/10 text-t2 hover:border-[var(--ac-glow)]'
+              }`}
+            >
+              {!boardPin ? 'Protect' : unlocked ? 'Remove PIN' : 'Unlock'}
+            </button>
+            <button
               onClick={clearAll}
-              className="px-[11px] py-[6px] bg-s2 border border-danger/20 rounded-[7px] text-danger text-[11px] font-medium hover:border-danger/40 transition-all"
+              disabled={!isEditable}
+              className="px-[11px] py-[6px] bg-s2 border border-danger/20 rounded-[7px] text-danger text-[11px] font-medium hover:border-danger/40 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Clear all
             </button>
@@ -260,7 +361,7 @@ export default function BoardPage() {
           <div className="text-[10px] font-semibold text-t3 uppercase tracking-[0.08em] mb-[10px]">
             Text - live sync, never expires
           </div>
-          <div className="bg-s1 border border-white/[0.06] rounded-xl overflow-hidden">
+          <div className={`bg-s1 border rounded-xl overflow-hidden ${!isEditable ? 'border-danger/20' : 'border-white/[0.06]'}`}>
             <div className="relative px-5 py-4">
               <div className="flex items-center gap-1 text-[10px] text-ok absolute top-4 right-4">
                 <div className={`w-[4px] h-[4px] rounded-full bg-ok ${synced ? '' : 'opacity-40'}`} />
@@ -269,10 +370,11 @@ export default function BoardPage() {
               <textarea
                 value={text}
                 onChange={(e) => handleTextChange(e.target.value.slice(0, 65000))}
-                placeholder="Start typing - changes sync to all connected devices instantly"
+                readOnly={!isEditable}
+                placeholder={isEditable ? 'Start typing - changes sync to all connected devices instantly' : 'Board is locked. Click Unlock to edit.'}
                 aria-label="Shared board text"
                 maxLength={65000}
-                className="w-full bg-transparent outline-none resize-y text-t1 text-[13px] leading-relaxed pr-20 min-h-[180px] max-h-[70vh] overflow-y-auto"
+                className={`w-full bg-transparent outline-none resize-y text-t1 text-[13px] leading-relaxed pr-20 min-h-[180px] max-h-[70vh] overflow-y-auto ${!isEditable ? 'cursor-not-allowed opacity-60' : ''}`}
               />
             </div>
             <div className="flex items-center justify-between px-5 py-[10px] border-t border-white/[0.06]">
@@ -280,8 +382,9 @@ export default function BoardPage() {
                 {text.length.toLocaleString()} / 65,000
               </span>
               <button
-                onClick={() => { setText(''); pushText(''); }}
-                className="text-[11px] text-t3 hover:text-t1 transition-colors bg-transparent border-none"
+                onClick={() => { if (isEditable) { setText(''); pushText(''); } }}
+                disabled={!isEditable}
+                className="text-[11px] text-t3 hover:text-t1 transition-colors bg-transparent border-none disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 Clear
               </button>
@@ -325,8 +428,9 @@ export default function BoardPage() {
                       </a>
                       <button
                         onClick={() => removeFile(slot)}
+                        disabled={!isEditable}
                         aria-label={`Remove ${slot.name}`}
-                        className="px-[8px] py-[6px] bg-s3 border border-white/10 rounded-[6px] text-t3 text-[10px] hover:text-danger hover:border-danger/20 transition-all"
+                        className="px-[8px] py-[6px] bg-s3 border border-white/10 rounded-[6px] text-t3 text-[10px] hover:text-danger hover:border-danger/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-t3 disabled:hover:border-white/10"
                       >
                         Remove
                       </button>
@@ -341,15 +445,15 @@ export default function BoardPage() {
               return (
                 <label
                   key={`empty-${i}`}
-                  className={`bg-s1 border border-dashed rounded-xl p-5 flex flex-col items-center gap-2 min-h-[148px] text-center transition-all cursor-pointer ${
-                    files.length >= 3 ? 'opacity-40 cursor-not-allowed border-white/10' : 'border-white/10 hover:border-[var(--ac-glow)]'
+                  className={`bg-s1 border border-dashed rounded-xl p-5 flex flex-col items-center gap-2 min-h-[148px] text-center transition-all ${
+                    !isEditable || files.length >= 3 ? 'opacity-40 cursor-not-allowed border-white/10' : 'border-white/10 hover:border-[var(--ac-glow)] cursor-pointer'
                   }`}
                 >
                   <input
                     type="file"
                     onChange={handleUpload}
                     className="sr-only"
-                    disabled={files.length >= 3}
+                    disabled={!isEditable || files.length >= 3}
                     aria-label="Upload file to board"
                   />
                   {isUploading ? (
@@ -400,6 +504,103 @@ export default function BoardPage() {
       <AdUnit slot="1122334455" format="horizontal" className="w-full py-[9px] border-t border-white/[0.06]" />
 
       <Footer />
+
+      {/* PIN dialog */}
+      {pinDialog && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setPinDialog(null);
+              setPinInput('');
+              setPinConfirm('');
+              setPinError('');
+            }
+          }}
+        >
+          <div className="bg-s1 border border-white/10 rounded-2xl p-6 w-full max-w-[300px]">
+            {pinDialog === 'set' ? (
+              <>
+                <div className="font-semibold text-[14px] mb-1">Protect this board</div>
+                <div className="text-[11px] text-t3 mb-5 leading-relaxed">
+                  Set a PIN so only you can edit. Others can still view and download files.
+                </div>
+                <div className="flex flex-col gap-3">
+                  <input
+                    autoFocus
+                    type="password"
+                    inputMode="numeric"
+                    value={pinInput}
+                    onChange={(e) => { setPinInput(e.target.value.replace(/\D/g, '').slice(0, 8)); setPinError(''); }}
+                    onKeyDown={(e) => e.key === 'Enter' && document.getElementById('pin-confirm-input')?.focus()}
+                    placeholder="Create PIN (4-8 digits)"
+                    className="w-full bg-s2 border border-white/10 rounded-[8px] px-3 py-[9px] text-[13px] text-t1 placeholder-t3 outline-none focus:border-white/25 text-center font-mono tracking-[0.15em]"
+                  />
+                  <input
+                    id="pin-confirm-input"
+                    type="password"
+                    inputMode="numeric"
+                    value={pinConfirm}
+                    onChange={(e) => { setPinConfirm(e.target.value.replace(/\D/g, '').slice(0, 8)); setPinError(''); }}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSetPin()}
+                    placeholder="Confirm PIN"
+                    className="w-full bg-s2 border border-white/10 rounded-[8px] px-3 py-[9px] text-[13px] text-t1 placeholder-t3 outline-none focus:border-white/25 text-center font-mono tracking-[0.15em]"
+                  />
+                  {pinError && <div className="text-[11px] text-danger">{pinError}</div>}
+                  <div className="flex gap-2 mt-1">
+                    <button
+                      onClick={handleSetPin}
+                      className="flex-1 bg-ac py-[9px] rounded-[7px] text-[12px] font-semibold text-white hover:bg-[#EA8C15] transition-colors"
+                    >
+                      Set PIN
+                    </button>
+                    <button
+                      onClick={() => { setPinDialog(null); setPinInput(''); setPinConfirm(''); setPinError(''); }}
+                      className="flex-1 border border-white/10 py-[9px] rounded-[7px] text-[12px] text-t2 hover:border-white/20 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="font-semibold text-[14px] mb-1">Board protected</div>
+                <div className="text-[11px] text-t3 mb-5 leading-relaxed">
+                  Enter the PIN to unlock editing on this device.
+                </div>
+                <div className="flex flex-col gap-3">
+                  <input
+                    autoFocus
+                    type="password"
+                    inputMode="numeric"
+                    value={pinInput}
+                    onChange={(e) => { setPinInput(e.target.value.replace(/\D/g, '').slice(0, 8)); setPinError(''); }}
+                    onKeyDown={(e) => e.key === 'Enter' && handleUnlock()}
+                    placeholder="Enter PIN"
+                    className="w-full bg-s2 border border-white/10 rounded-[8px] px-3 py-[9px] text-[13px] text-t1 placeholder-t3 outline-none focus:border-white/25 text-center font-mono tracking-[0.15em]"
+                  />
+                  {pinError && <div className="text-[11px] text-danger">{pinError}</div>}
+                  <div className="flex gap-2 mt-1">
+                    <button
+                      onClick={handleUnlock}
+                      className="flex-1 bg-ac py-[9px] rounded-[7px] text-[12px] font-semibold text-white hover:bg-[#EA8C15] transition-colors"
+                    >
+                      Unlock
+                    </button>
+                    <button
+                      onClick={() => { setPinDialog(null); setPinInput(''); setPinError(''); }}
+                      className="flex-1 border border-white/10 py-[9px] rounded-[7px] text-[12px] text-t2 hover:border-white/20 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

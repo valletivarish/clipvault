@@ -5,7 +5,7 @@ import { runGlobalCleanup } from '@/lib/boardCleanup';
 
 export default function CleanupWorker() {
   useEffect(() => {
-    // Run once per page load, no polling — stays cheap
+    // Run once per page load, no polling, stays cheap
     runGlobalCleanup();
   }, []);
 
