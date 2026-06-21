@@ -18,7 +18,7 @@ export default function BoardGenerator() {
       {/* Your own board name */}
       <div className="mb-2 px-1">
         <label htmlFor="board-name" className="text-[10px] font-semibold uppercase tracking-[0.08em] text-t3">
-          Enter a board name
+          Board ID
         </label>
       </div>
       <input
@@ -28,7 +28,7 @@ export default function BoardGenerator() {
         onKeyDown={(e) => e.key === 'Enter' && open()}
         spellCheck={false}
         autoComplete="off"
-        placeholder="your-board-name"
+        placeholder="enter the board id"
         aria-label="Board name"
         className="mb-2 w-full rounded-xl border border-white/10 bg-s1 px-5 py-4 font-mono text-[20px] font-bold uppercase tracking-[0.06em] text-t1 placeholder:normal-case placeholder:tracking-normal placeholder:text-t3/40 outline-none transition-colors focus:border-[var(--ac-glow)]"
       />
@@ -36,12 +36,12 @@ export default function BoardGenerator() {
       <p className="mb-4 min-h-[16px] px-1 text-[11px]">
         {slug ? (
           <span className="text-t3">
-            Opens at <span className="font-mono text-t2">/b/{slug}</span> - same name joins the same board
+            Opens at <span className="font-mono text-t2">/b/{slug}</span> - same id joins the same board
           </span>
         ) : touched ? (
           <span className="text-warn">Use {BOARD_MIN}-{BOARD_MAX} letters, numbers or hyphens</span>
         ) : (
-          <span className="text-t3">Pick any name, or generate one with the button</span>
+          <span className="text-t3">Enter any id, or generate one with the button</span>
         )}
       </p>
 

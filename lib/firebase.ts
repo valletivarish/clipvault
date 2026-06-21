@@ -15,3 +15,8 @@ const firebaseConfig = {
 export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// Give up on a failing upload after ~12s instead of retrying for minutes,
+// so the UI does not hang on "Uploading..." when Storage is unreachable.
+storage.maxUploadRetryTime = 12000;
+storage.maxOperationRetryTime = 12000;
