@@ -73,7 +73,7 @@ export default function BoardPage() {
   }, [boardName]);
 
   useEffect(() => {
-    const unsub = onSnapshot(boardRef, async (snap) => {
+    const unsub = onSnapshot(boardRef, (snap) => {
       if (!snap.exists()) return;
       const data = snap.data();
       isRemote.current = true;
@@ -81,21 +81,13 @@ export default function BoardPage() {
 
       const now = Date.now();
       const all: FileSlot[] = data.files ?? [];
-      const expired = all.filter((f) => f.expiresAt && f.expiresAt <= now);
+      // Only filter display — global CleanupWorker handles actual deletion
       const live = all.filter((f) => !f.expiresAt || f.expiresAt > now);
-
-      // Delete expired files immediately
-      if (expired.length > 0) {
-        for (const f of expired) {
-          try { await deleteObject(ref(storage, f.storagePath)); } catch {}
-        }
-        await updateDoc(boardRef, { files: live }).catch(() => {});
-      }
 
       setFiles(live);
       setSynced(true);
 
-      // Schedule auto-removal for files expiring in the future
+      // Schedule in-session removal for files expiring while the board is open
       live.forEach((f) => {
         if (!f.expiresAt) return;
         const delay = f.expiresAt - Date.now();
@@ -161,9 +153,14 @@ export default function BoardPage() {
         const url = await getDownloadURL(task.snapshot.ref);
         const finalized = { ...newSlot, url };
         setUploading((prev) => { const n = { ...prev }; delete n[id]; return n; });
+        const updatedFiles = [...files, finalized];
+        const nextCleanupAt = updatedFiles
+          .filter((f) => f.expiresAt)
+          .reduce((min, f) => Math.min(min, f.expiresAt!), Infinity);
         await updateDoc(boardRef, {
-          files: [...files, finalized],
-        }).catch(() => setDoc(boardRef, { text, files: [finalized] }));
+          files: updatedFiles,
+          nextCleanupAt: isFinite(nextCleanupAt) ? nextCleanupAt : null,
+        }).catch(() => setDoc(boardRef, { text, files: updatedFiles, nextCleanupAt: isFinite(nextCleanupAt) ? nextCleanupAt : null }));
       }
     );
   };
@@ -171,8 +168,13 @@ export default function BoardPage() {
   const removeFile = async (slot: FileSlot) => {
     const updated = files.filter((f) => f.id !== slot.id);
     setFiles(updated);
-    await updateDoc(boardRef, { files: updated });
     try { await deleteObject(ref(storage, slot.storagePath)); } catch {}
+    const nextCleanupAt = updated.filter((f) => f.expiresAt)
+      .reduce((min, f) => Math.min(min, f.expiresAt!), Infinity);
+    await updateDoc(boardRef, {
+      files: updated,
+      nextCleanupAt: isFinite(nextCleanupAt) ? nextCleanupAt : null,
+    });
   };
 
   const clearAll = async () => {
@@ -181,7 +183,7 @@ export default function BoardPage() {
     }
     setText('');
     setFiles([]);
-    await setDoc(boardRef, { text: '', files: [] });
+    await setDoc(boardRef, { text: '', files: [], nextCleanupAt: null });
   };
 
   const copyLink = () => {
@@ -254,7 +256,7 @@ export default function BoardPage() {
                 placeholder="Start typing - changes sync to all connected devices instantly"
                 aria-label="Shared board text"
                 maxLength={65000}
-                className="w-full bg-transparent outline-none resize-none text-t1 text-[15px] leading-[1.75] pr-20 min-h-[260px]"
+                className="w-full bg-transparent outline-none resize-none text-t1 text-[13px] leading-relaxed pr-20 min-h-[260px]"
               />
             </div>
             <div className="flex items-center justify-between px-5 py-[10px] border-t border-white/[0.06]">

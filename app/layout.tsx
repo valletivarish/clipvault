@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Space_Grotesk, DM_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import FirebaseAnalytics from '@/components/FirebaseAnalytics';
+import CleanupWorker from '@/components/CleanupWorker';
 
 const spaceGrotesk = Space_Grotesk({
   weight: ['500', '600', '700'],
@@ -39,6 +40,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen flex flex-col bg-bg text-t1">
         <FirebaseAnalytics />
+        <CleanupWorker />
         {children}
       </body>
     </html>
