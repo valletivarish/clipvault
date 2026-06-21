@@ -6,7 +6,7 @@
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 export const BOARD_MIN = 3;
-export const BOARD_MAX = 40;
+export const BOARD_MAX = 6;
 
 // Generate a short, shareable code (shown uppercase, stored lowercase).
 export function generateBoardCode(): string {
@@ -17,7 +17,7 @@ export function generateBoardCode(): string {
 }
 
 // Turn any raw input into a safe, URL-clean, lowercase slug, or null if it
-// cannot be made into a valid name. A valid slug is 3-40 chars of lowercase
+// cannot be made into a valid name. A valid slug is 3-6 chars of lowercase
 // letters, digits, and single hyphens, starting and ending alphanumeric.
 //
 // Lowercasing makes names case-insensitive so "TeamBoard" and "teamboard"
