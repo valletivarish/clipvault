@@ -64,7 +64,7 @@ export default function BoardPage() {
   const textDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const expiryTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const lastPushed = useRef('');
-  const [connError, setConnError] = useState(false);
+  const [connected, setConnected] = useState(false);
 
   const boardRef = doc(db, 'boards', boardName);
 
@@ -75,22 +75,19 @@ export default function BoardPage() {
   }, [boardName]);
 
   useEffect(() => {
-    setConnError(false);
+    setConnected(false);
     const unsub = onSnapshot(
       boardRef,
       (snap) => {
         const incoming = snap.exists() ? (snap.data().text ?? '') : '';
-        // Only update local text if it came from another client (not our own push)
-        if (incoming !== lastPushed.current) {
-          setText(incoming);
-        }
+        if (incoming !== lastPushed.current) setText(incoming);
 
         const now = Date.now();
         const all: FileSlot[] = snap.exists() ? (snap.data().files ?? []) : [];
         const live = all.filter((f) => !f.expiresAt || f.expiresAt > now);
         setFiles(live);
         setSynced(true);
-        setConnError(false);
+        setConnected(true);
 
         live.forEach((f) => {
           if (!f.expiresAt) return;
@@ -105,7 +102,7 @@ export default function BoardPage() {
           }, delay);
         });
       },
-      () => { setConnError(true); setSynced(false); }
+      (err) => { console.error('Board sync error:', err); setConnected(false); setSynced(false); }
     );
 
     return () => {
@@ -122,8 +119,9 @@ export default function BoardPage() {
       try {
         await setDoc(boardRef, { text: val }, { merge: true });
         setSynced(true);
-      } catch {
-        setConnError(true);
+      } catch (err) {
+        console.error('Push text error:', err);
+        setSynced(false);
       }
     }, 500);
   }, [boardName]);
@@ -218,17 +216,14 @@ export default function BoardPage() {
               {boardName}
             </div>
             <div className="flex items-center gap-2 mb-[6px]">
-              {connError ? (
-                <div className="flex items-center gap-1 text-[10px] font-medium px-2 py-[3px] rounded-[5px] bg-danger/[0.06] text-danger border border-danger/[0.20]">
-                  <div className="w-[5px] h-[5px] rounded-full bg-danger" />
-                  Not connected - enable Firestore
-                </div>
-              ) : (
-                <div className="flex items-center gap-1 text-[10px] font-medium px-2 py-[3px] rounded-[5px] bg-ok/[0.06] text-ok border border-ok/[0.15]">
-                  <div className="w-[5px] h-[5px] rounded-full bg-ok animate-pulse" />
-                  Live
-                </div>
-              )}
+              <div className={`flex items-center gap-1 text-[10px] font-medium px-2 py-[3px] rounded-[5px] border ${
+                connected
+                  ? 'bg-ok/[0.06] text-ok border-ok/[0.15]'
+                  : 'bg-s3 text-t3 border-white/[0.06]'
+              }`}>
+                <div className={`w-[5px] h-[5px] rounded-full ${connected ? 'bg-ok animate-pulse' : 'bg-t3'}`} />
+                {connected ? 'Live' : 'Connecting...'}
+              </div>
               <div className="bg-s2 text-t3 border border-white/[0.06] text-[10px] px-2 py-[3px] rounded-[5px] font-medium">
                 Free board
               </div>

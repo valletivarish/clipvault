@@ -15,14 +15,10 @@ function sanitize(val: string): string {
 
 export default function BoardGenerator() {
   const router = useRouter();
-  const [boardName, setBoardName] = useState('');
+  const [boardName, setBoardName] = useState(generateBoardName);
   const [joinInput, setJoinInput] = useState('');
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    setBoardName(generateBoardName());
-  }, []);
 
   const handleCreate = () => {
     const name = boardName.trim();
@@ -47,7 +43,7 @@ export default function BoardGenerator() {
             value={boardName}
             onChange={(e) => { setBoardName(sanitize(e.target.value)); setError(''); }}
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-            placeholder="my-board or auto-generated"
+            placeholder=""
             className="flex-1 font-mono font-semibold text-[17px] text-t1 bg-transparent outline-none placeholder-t3 min-w-0"
             aria-label="Board name"
           />
