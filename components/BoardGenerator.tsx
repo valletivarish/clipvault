@@ -1,14 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { generateBoardCode, slugifyBoardName, BOARD_MIN, BOARD_MAX } from '@/lib/board';
 
 export default function BoardGenerator() {
   const router = useRouter();
-  const [value, setValue] = useState(generateBoardCode);
+  const [value, setValue] = useState('');
   const [joinValue, setJoinValue] = useState('');
   const [joining, setJoining] = useState(false);
+
+  // Generate the starter code on the client only. Doing it during render
+  // (Math.random) makes the server and client produce different codes, which
+  // breaks hydration.
+  useEffect(() => { setValue(generateBoardCode()); }, []);
 
   const slug = slugifyBoardName(value);
   const joinSlug = slugifyBoardName(joinValue);
@@ -19,15 +24,23 @@ export default function BoardGenerator() {
   return (
     <div className="mx-auto w-full max-w-[360px]">
       {/* Board name: use the generated code or type your own */}
-      <div className="mb-3 flex items-center gap-3 rounded-xl border border-white/10 bg-s1 px-5 py-4">
+      <div className="mb-2 flex items-center justify-between px-1">
+        <label htmlFor="board-name" className="text-[10px] font-semibold uppercase tracking-[0.08em] text-t3">
+          Name your board
+        </label>
+        <span className="text-[10px] text-t3">type your own or use the code</span>
+      </div>
+      <div className="mb-3 flex items-center gap-3 rounded-xl border border-white/10 bg-s1 px-5 py-4 transition-colors focus-within:border-[var(--ac-glow)]">
         <input
+          id="board-name"
           value={value}
           onChange={(e) => setValue(e.target.value.slice(0, BOARD_MAX))}
           onKeyDown={(e) => e.key === 'Enter' && open(slug)}
           spellCheck={false}
           autoComplete="off"
+          placeholder="type-a-name"
           aria-label="Board name"
-          className="min-w-0 flex-1 bg-transparent font-mono font-bold text-[26px] uppercase tracking-[0.1em] text-t1 placeholder-t3 outline-none"
+          className="min-w-0 flex-1 bg-transparent font-mono font-bold text-[26px] uppercase tracking-[0.1em] text-t1 placeholder:text-t3/50 placeholder:normal-case outline-none"
         />
         <button
           onClick={() => setValue(generateBoardCode())}
