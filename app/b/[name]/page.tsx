@@ -63,7 +63,8 @@ export default function BoardPage() {
 
   const textDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const expiryTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
-  const isRemote = useRef(false);
+  const lastPushed = useRef('');
+  const [connError, setConnError] = useState(false);
 
   const boardRef = doc(db, 'boards', boardName);
 
@@ -74,34 +75,38 @@ export default function BoardPage() {
   }, [boardName]);
 
   useEffect(() => {
-    const unsub = onSnapshot(boardRef, (snap) => {
-      if (!snap.exists()) return;
-      const data = snap.data();
-      isRemote.current = true;
-      setText(data.text ?? '');
+    setConnError(false);
+    const unsub = onSnapshot(
+      boardRef,
+      (snap) => {
+        const incoming = snap.exists() ? (snap.data().text ?? '') : '';
+        // Only update local text if it came from another client (not our own push)
+        if (incoming !== lastPushed.current) {
+          setText(incoming);
+        }
 
-      const now = Date.now();
-      const all: FileSlot[] = data.files ?? [];
-      // Only filter display — global CleanupWorker handles actual deletion
-      const live = all.filter((f) => !f.expiresAt || f.expiresAt > now);
+        const now = Date.now();
+        const all: FileSlot[] = snap.exists() ? (snap.data().files ?? []) : [];
+        const live = all.filter((f) => !f.expiresAt || f.expiresAt > now);
+        setFiles(live);
+        setSynced(true);
+        setConnError(false);
 
-      setFiles(live);
-      setSynced(true);
-
-      // Schedule in-session removal for files expiring while the board is open
-      live.forEach((f) => {
-        if (!f.expiresAt) return;
-        const delay = f.expiresAt - Date.now();
-        if (delay <= 0) return;
-        if (expiryTimers.current[f.id]) clearTimeout(expiryTimers.current[f.id]);
-        expiryTimers.current[f.id] = setTimeout(() => {
-          setFiles((prev) => {
-            purgeFile(f, prev);
-            return prev.filter((x) => x.id !== f.id);
-          });
-        }, delay);
-      });
-    });
+        live.forEach((f) => {
+          if (!f.expiresAt) return;
+          const delay = f.expiresAt - Date.now();
+          if (delay <= 0) return;
+          if (expiryTimers.current[f.id]) clearTimeout(expiryTimers.current[f.id]);
+          expiryTimers.current[f.id] = setTimeout(() => {
+            setFiles((prev) => {
+              purgeFile(f, prev);
+              return prev.filter((x) => x.id !== f.id);
+            });
+          }, delay);
+        });
+      },
+      () => { setConnError(true); setSynced(false); }
+    );
 
     return () => {
       unsub();
@@ -110,16 +115,20 @@ export default function BoardPage() {
   }, [boardName]);
 
   const pushText = useCallback((val: string) => {
+    lastPushed.current = val;
     setSynced(false);
     if (textDebounce.current) clearTimeout(textDebounce.current);
     textDebounce.current = setTimeout(async () => {
-      await setDoc(boardRef, { text: val }, { merge: true });
-      setSynced(true);
-    }, 600);
+      try {
+        await setDoc(boardRef, { text: val }, { merge: true });
+        setSynced(true);
+      } catch {
+        setConnError(true);
+      }
+    }, 500);
   }, [boardName]);
 
   const handleTextChange = (val: string) => {
-    if (isRemote.current) { isRemote.current = false; return; }
     setText(val);
     pushText(val);
   };
@@ -209,10 +218,17 @@ export default function BoardPage() {
               {boardName}
             </div>
             <div className="flex items-center gap-2 mb-[6px]">
-              <div className="flex items-center gap-1 text-[10px] font-medium px-2 py-[3px] rounded-[5px] bg-ok/[0.06] text-ok border border-ok/[0.15]">
-                <div className="w-[5px] h-[5px] rounded-full bg-ok animate-pulse" />
-                Live
-              </div>
+              {connError ? (
+                <div className="flex items-center gap-1 text-[10px] font-medium px-2 py-[3px] rounded-[5px] bg-danger/[0.06] text-danger border border-danger/[0.20]">
+                  <div className="w-[5px] h-[5px] rounded-full bg-danger" />
+                  Not connected - enable Firestore
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 text-[10px] font-medium px-2 py-[3px] rounded-[5px] bg-ok/[0.06] text-ok border border-ok/[0.15]">
+                  <div className="w-[5px] h-[5px] rounded-full bg-ok animate-pulse" />
+                  Live
+                </div>
+              )}
               <div className="bg-s2 text-t3 border border-white/[0.06] text-[10px] px-2 py-[3px] rounded-[5px] font-medium">
                 Free board
               </div>
