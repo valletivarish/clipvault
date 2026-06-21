@@ -1,105 +1,60 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
-function generateBoardName(): string {
+function generate(): string {
   return Array.from({ length: 6 }, () => CHARS[Math.floor(Math.random() * CHARS.length)]).join('');
-}
-
-function sanitize(val: string): string {
-  return val.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 32);
 }
 
 export default function BoardGenerator() {
   const router = useRouter();
-  const [boardName, setBoardName] = useState(generateBoardName);
-  const [joinInput, setJoinInput] = useState('');
+  const [code, setCode] = useState(generate);
+  const [joinCode, setJoinCode] = useState('');
   const [joining, setJoining] = useState(false);
-  const [focused, setFocused] = useState(false);
-  const [error, setError] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleCreate = () => {
-    const name = boardName.trim();
-    if (!name) { setError('Enter a board name'); return; }
-    router.push(`/b/${name}`);
-  };
-
-  const handleJoin = () => {
-    const code = sanitize(joinInput.trim());
-    if (code) router.push(`/b/${code}`);
-  };
 
   return (
-    <div className="mx-auto w-full max-w-[400px]">
-      <div className="mb-2">
-        <label className="text-[10px] font-semibold text-t3 uppercase tracking-[0.08em] mb-[6px] block">
-          Board name / key
-        </label>
-
-        {/* Clicking anywhere in the box focuses the input */}
-        <div
-          onClick={() => inputRef.current?.focus()}
-          className={`flex items-center gap-[8px] rounded-xl border bg-s1 p-[12px_14px] cursor-text transition-colors ${
-            focused ? 'border-white/25' : 'border-white/10 hover:border-white/18'
-          }`}
+    <div className="mx-auto w-full max-w-[360px]">
+      {/* Generated code display */}
+      <div className="mb-4 flex items-center gap-3 rounded-xl border border-white/10 bg-s1 px-5 py-4">
+        <span className="flex-1 font-mono font-bold text-[28px] tracking-[0.12em] text-t1 select-all">
+          {code}
+        </span>
+        <button
+          onClick={() => setCode(generate())}
+          className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-white/10 bg-s3 text-t3 hover:border-white/20 hover:text-t2 transition-colors flex-shrink-0"
+          aria-label="Generate new code"
+          title="New code"
         >
-          <input
-            ref={inputRef}
-            value={boardName}
-            onChange={(e) => { setBoardName(sanitize(e.target.value)); setError(''); }}
-            onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            className="flex-1 font-mono font-semibold text-[17px] text-t1 bg-transparent outline-none min-w-0"
-            aria-label="Board name"
-          />
-
-          {/* Pencil icon — visible when not focused, signals the field is editable */}
-          {!focused && (
-            <svg
-              width="13" height="13" viewBox="0 0 13 13" fill="none"
-              className="text-t3 flex-shrink-0 pointer-events-none"
-              aria-hidden="true"
-            >
-              <path d="M9 1.5l2.5 2.5-7 7H2V8.5l7-7z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
-              <path d="M7.5 3l2.5 2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-            </svg>
-          )}
-
-          <button
-            onClick={(e) => { e.stopPropagation(); setBoardName(generateBoardName()); setError(''); }}
-            className="flex h-[30px] w-[30px] items-center justify-center rounded-[7px] border border-white/10 bg-s3 text-t3 transition-colors hover:border-white/20 hover:text-t2 flex-shrink-0"
-            aria-label="Generate random name"
-            tabIndex={-1}
-          >
-            &#8635;
-          </button>
-        </div>
-
-        {error && <p className="mt-1 text-[11px] text-danger">{error}</p>}
-        <p className="mt-[5px] text-[10px] text-t3">
-          {focused ? 'Letters, numbers, - and _ only' : 'Click to edit or refresh for a new code'}
-        </p>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M12 2.5A5.5 5.5 0 1 0 13 7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+            <path d="M10.5 1v3h3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
       </div>
 
+      <p className="text-center text-[11px] text-t3 mb-4">
+        Share this 6-digit code with anyone to join the board
+      </p>
+
+      {/* Join input */}
       {joining && (
-        <div className="mb-[10px] flex gap-2">
+        <div className="mb-3 flex gap-2">
           <input
             autoFocus
-            value={joinInput}
-            onChange={(e) => setJoinInput(sanitize(e.target.value))}
-            onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-            placeholder="Enter board name or key..."
-            className="flex-1 rounded-[7px] border border-white/10 bg-s1 px-3 py-[10px] font-mono text-[14px] text-t1 placeholder-t3 outline-none focus:border-white/20"
+            value={joinCode}
+            onChange={(e) => setJoinCode(e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 6))}
+            onKeyDown={(e) => e.key === 'Enter' && joinCode.length === 6 && router.push(`/b/${joinCode}`)}
+            placeholder="Enter 6-digit code"
+            className="flex-1 rounded-[8px] border border-white/10 bg-s1 px-3 py-[10px] font-mono text-[16px] font-bold tracking-[0.1em] text-t1 placeholder-t3 outline-none focus:border-white/25 text-center"
+            maxLength={6}
           />
           <button
-            onClick={handleJoin}
-            disabled={!joinInput.trim()}
-            className="rounded-[7px] border border-white/10 px-4 py-[10px] text-[13px] text-t2 transition-colors hover:border-white/20 hover:text-t1 disabled:opacity-40"
+            onClick={() => joinCode.length === 6 && router.push(`/b/${joinCode}`)}
+            disabled={joinCode.length !== 6}
+            className="rounded-[8px] border border-white/10 px-4 py-[10px] text-[13px] text-t2 transition-colors hover:border-white/20 hover:text-t1 disabled:opacity-40"
           >
             Go
           </button>
@@ -108,14 +63,14 @@ export default function BoardGenerator() {
 
       <div className="flex gap-2">
         <button
-          onClick={handleCreate}
-          className="flex-1 rounded-[7px] bg-ac py-[10px] text-[13px] font-semibold text-white transition-colors hover:bg-[#EA8C15] active:scale-[0.97]"
+          onClick={() => router.push(`/b/${code}`)}
+          className="flex-1 rounded-[8px] bg-ac py-[11px] text-[13px] font-semibold text-white hover:bg-[#EA8C15] active:scale-[0.97] transition-all"
         >
           Create board
         </button>
         <button
-          onClick={() => { setJoining(!joining); setJoinInput(''); }}
-          className={`flex-1 rounded-[7px] border py-[10px] text-[13px] transition-colors active:scale-[0.97] ${
+          onClick={() => { setJoining(!joining); setJoinCode(''); }}
+          className={`flex-1 rounded-[8px] border py-[11px] text-[13px] transition-all active:scale-[0.97] ${
             joining ? 'border-white/20 text-t1' : 'border-white/10 text-t2 hover:border-white/20 hover:text-t1'
           }`}
         >

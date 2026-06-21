@@ -76,6 +76,8 @@ export default function BoardPage() {
 
   useEffect(() => {
     setConnected(false);
+    // If Firestore doesn't connect in 8s, stop showing "Connecting..."
+    const timeout = setTimeout(() => setConnected(false), 8000);
     const unsub = onSnapshot(
       boardRef,
       (snap) => {
@@ -88,6 +90,7 @@ export default function BoardPage() {
         setFiles(live);
         setSynced(true);
         setConnected(true);
+        clearTimeout(timeout);
 
         live.forEach((f) => {
           if (!f.expiresAt) return;
@@ -102,11 +105,12 @@ export default function BoardPage() {
           }, delay);
         });
       },
-      (err) => { console.error('Board sync error:', err); setConnected(false); setSynced(false); }
+      (err) => { console.error('Board sync error:', err); setConnected(false); setSynced(false); clearTimeout(timeout); }
     );
 
     return () => {
       unsub();
+      clearTimeout(timeout);
       Object.values(expiryTimers.current).forEach(clearTimeout);
     };
   }, [boardName]);
