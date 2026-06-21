@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -18,7 +18,9 @@ export default function BoardGenerator() {
   const [boardName, setBoardName] = useState(generateBoardName);
   const [joinInput, setJoinInput] = useState('');
   const [joining, setJoining] = useState(false);
+  const [focused, setFocused] = useState(false);
   const [error, setError] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleCreate = () => {
     const name = boardName.trim();
@@ -33,34 +35,57 @@ export default function BoardGenerator() {
 
   return (
     <div className="mx-auto w-full max-w-[400px]">
-      {/* Board name - editable */}
       <div className="mb-2">
         <label className="text-[10px] font-semibold text-t3 uppercase tracking-[0.08em] mb-[6px] block">
           Board name / key
         </label>
-        <div className="flex items-center gap-[8px] rounded-xl border border-white/10 bg-s1 p-[12px_14px]">
+
+        {/* Clicking anywhere in the box focuses the input */}
+        <div
+          onClick={() => inputRef.current?.focus()}
+          className={`flex items-center gap-[8px] rounded-xl border bg-s1 p-[12px_14px] cursor-text transition-colors ${
+            focused ? 'border-white/25' : 'border-white/10 hover:border-white/18'
+          }`}
+        >
           <input
+            ref={inputRef}
             value={boardName}
             onChange={(e) => { setBoardName(sanitize(e.target.value)); setError(''); }}
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-            placeholder=""
-            className="flex-1 font-mono font-semibold text-[17px] text-t1 bg-transparent outline-none placeholder-t3 min-w-0"
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            className="flex-1 font-mono font-semibold text-[17px] text-t1 bg-transparent outline-none min-w-0"
             aria-label="Board name"
           />
+
+          {/* Pencil icon — visible when not focused, signals the field is editable */}
+          {!focused && (
+            <svg
+              width="13" height="13" viewBox="0 0 13 13" fill="none"
+              className="text-t3 flex-shrink-0 pointer-events-none"
+              aria-hidden="true"
+            >
+              <path d="M9 1.5l2.5 2.5-7 7H2V8.5l7-7z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
+              <path d="M7.5 3l2.5 2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+            </svg>
+          )}
+
           <button
-            onClick={() => { setBoardName(generateBoardName()); setError(''); }}
-            className="flex h-[30px] w-[30px] items-center justify-center rounded-[7px] border border-white/10 bg-s3 text-t3 text-sm transition-colors hover:border-white/20 hover:text-t2 flex-shrink-0"
+            onClick={(e) => { e.stopPropagation(); setBoardName(generateBoardName()); setError(''); }}
+            className="flex h-[30px] w-[30px] items-center justify-center rounded-[7px] border border-white/10 bg-s3 text-t3 transition-colors hover:border-white/20 hover:text-t2 flex-shrink-0"
             aria-label="Generate random name"
-            title="Generate random"
+            tabIndex={-1}
           >
             &#8635;
           </button>
         </div>
+
         {error && <p className="mt-1 text-[11px] text-danger">{error}</p>}
-        <p className="mt-[5px] text-[10px] text-t3">Type your own key or use the generated one</p>
+        <p className="mt-[5px] text-[10px] text-t3">
+          {focused ? 'Letters, numbers, - and _ only' : 'Click to edit or refresh for a new code'}
+        </p>
       </div>
 
-      {/* Join input */}
       {joining && (
         <div className="mb-[10px] flex gap-2">
           <input
@@ -81,7 +106,6 @@ export default function BoardGenerator() {
         </div>
       )}
 
-      {/* Action buttons */}
       <div className="flex gap-2">
         <button
           onClick={handleCreate}
@@ -92,9 +116,7 @@ export default function BoardGenerator() {
         <button
           onClick={() => { setJoining(!joining); setJoinInput(''); }}
           className={`flex-1 rounded-[7px] border py-[10px] text-[13px] transition-colors active:scale-[0.97] ${
-            joining
-              ? 'border-white/20 text-t1'
-              : 'border-white/10 text-t2 hover:border-white/20 hover:text-t1'
+            joining ? 'border-white/20 text-t1' : 'border-white/10 text-t2 hover:border-white/20 hover:text-t1'
           }`}
         >
           {joining ? 'Cancel' : 'Join existing'}
