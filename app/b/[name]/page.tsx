@@ -1,9 +1,12 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
+import { db, storage } from '@/lib/firebase';
+import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 
 type ExpiryValue = '1h' | '24h' | '7d' | '30d' | 'never';
 
@@ -12,14 +15,10 @@ interface FileSlot {
   name: string;
   ext: string;
   size: string;
-  expiry: string;
-  isWarn: boolean;
+  url: string;
+  storagePath: string;
+  expiresAt: number | null;
 }
-
-const INITIAL_FILES: FileSlot[] = [
-  { id: '1', name: 'report_Q2.pdf', ext: 'PDF', size: '2.4 MB', expiry: '23h 41m', isWarn: true },
-  { id: '2', name: 'data.xlsx',     ext: 'XLS', size: '1.1 MB', expiry: 'never',   isWarn: false },
-];
 
 function extFromName(name: string): string {
   const e = name.split('.').pop()?.toLowerCase() ?? '';
@@ -32,35 +31,121 @@ function extFromName(name: string): string {
   return MAP[e] ?? (e.toUpperCase().slice(0, 4) || 'FILE');
 }
 
+function expiryLabel(expiresAt: number | null): string {
+  if (!expiresAt) return 'never';
+  const diff = expiresAt - Date.now();
+  if (diff <= 0) return 'expired';
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  if (h >= 24) return `${Math.floor(h / 24)}d ${h % 24}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function expiryMs(val: ExpiryValue): number | null {
+  const map: Record<ExpiryValue, number | null> = {
+    '1h': 3600000, '24h': 86400000, '7d': 604800000, '30d': 2592000000, 'never': null,
+  };
+  return map[val];
+}
+
 export default function BoardPage() {
   const params = useParams();
   const boardName = (params?.name as string) || 'swift-tiger-42';
 
   const [text, setText] = useState('');
-  const [files, setFiles] = useState<FileSlot[]>(INITIAL_FILES);
+  const [files, setFiles] = useState<FileSlot[]>([]);
   const [expiry, setExpiry] = useState<ExpiryValue>('24h');
   const [copied, setCopied] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
-  const [connectedCount, setConnectedCount] = useState(1);
-  const MAX_CONNECTIONS = 5;
+  const [uploading, setUploading] = useState<Record<string, number>>({});
+  const [synced, setSynced] = useState(true);
+
+  const textDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isRemote = useRef(false);
+
+  const boardRef = doc(db, 'boards', boardName);
 
   useEffect(() => {
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL ?? 'ws://localhost:3001';
-    const ws = new WebSocket(`${wsUrl}?board=${encodeURIComponent(boardName)}`);
-    wsRef.current = ws;
+    const unsub = onSnapshot(boardRef, (snap) => {
+      if (!snap.exists()) return;
+      const data = snap.data();
+      isRemote.current = true;
+      setText(data.text ?? '');
+      const now = Date.now();
+      const live = (data.files ?? []).filter((f: FileSlot) => !f.expiresAt || f.expiresAt > now);
+      setFiles(live);
+      setSynced(true);
+    });
+    return () => unsub();
+  }, [boardName]);
 
-    ws.onmessage = (e) => {
-      try {
-        const msg = JSON.parse(e.data) as { type: string; text?: string; count?: number };
-        if (msg.type === 'text' && msg.text !== undefined) setText(msg.text);
-        if (msg.type === 'connected' && msg.count !== undefined) setConnectedCount(msg.count);
-      } catch {}
+  const pushText = useCallback((val: string) => {
+    setSynced(false);
+    if (textDebounce.current) clearTimeout(textDebounce.current);
+    textDebounce.current = setTimeout(async () => {
+      await setDoc(boardRef, { text: val }, { merge: true });
+      setSynced(true);
+    }, 600);
+  }, [boardName]);
+
+  const handleTextChange = (val: string) => {
+    if (isRemote.current) { isRemote.current = false; return; }
+    setText(val);
+    pushText(val);
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f || files.length >= 3) return;
+    e.target.value = '';
+
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const storagePath = `boards/${boardName}/${id}-${f.name}`;
+    const storageRef = ref(storage, storagePath);
+    const ms = expiryMs(expiry);
+
+    const newSlot: FileSlot = {
+      id, name: f.name, ext: extFromName(f.name),
+      size: `${(f.size / 1024 / 1024).toFixed(1)} MB`,
+      url: '', storagePath,
+      expiresAt: ms ? Date.now() + ms : null,
     };
 
-    ws.onerror = () => {};
+    setUploading((prev) => ({ ...prev, [id]: 0 }));
+    const task = uploadBytesResumable(storageRef, f);
 
-    return () => { ws.close(); };
-  }, [boardName]);
+    task.on('state_changed',
+      (snap) => {
+        const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+        setUploading((prev) => ({ ...prev, [id]: pct }));
+      },
+      () => { setUploading((prev) => { const n = { ...prev }; delete n[id]; return n; }); },
+      async () => {
+        const url = await getDownloadURL(task.snapshot.ref);
+        const finalized = { ...newSlot, url };
+        setUploading((prev) => { const n = { ...prev }; delete n[id]; return n; });
+        await updateDoc(boardRef, {
+          files: [...files, finalized],
+        }).catch(() => setDoc(boardRef, { text, files: [finalized] }));
+      }
+    );
+  };
+
+  const removeFile = async (slot: FileSlot) => {
+    const updated = files.filter((f) => f.id !== slot.id);
+    setFiles(updated);
+    await updateDoc(boardRef, { files: updated });
+    try { await deleteObject(ref(storage, slot.storagePath)); } catch {}
+  };
+
+  const clearAll = async () => {
+    for (const f of files) {
+      try { await deleteObject(ref(storage, f.storagePath)); } catch {}
+    }
+    setText('');
+    setFiles([]);
+    await setDoc(boardRef, { text: '', files: [] });
+  };
 
   const copyLink = () => {
     navigator.clipboard.writeText(`https://clipvault-tools.vercel.app/b/${boardName}`);
@@ -68,24 +153,6 @@ export default function BoardPage() {
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const newSlot: FileSlot = {
-      id: Date.now().toString(),
-      name: f.name,
-      ext: extFromName(f.name),
-      size: `${(f.size / 1024 / 1024).toFixed(1)} MB`,
-      expiry: expiry === 'never' ? 'never' : expiry,
-      isWarn: expiry !== 'never' && expiry !== '30d',
-    };
-    setFiles((prev) => [...prev.slice(0, 2), newSlot]);
-    e.target.value = '';
-  };
-
-  const removeFile = (id: string) => setFiles((prev) => prev.filter((f) => f.id !== id));
-
-  // Always show 3 visual slots: filled slots + empty drop zone(s) up to 3
   const displaySlots = [
     ...files.slice(0, 3),
     ...Array(Math.max(0, 3 - files.length)).fill(null),
@@ -95,7 +162,6 @@ export default function BoardPage() {
     <div className="min-h-screen flex flex-col bg-bg text-t1">
       <Nav />
 
-      {/* Board header */}
       <header className="px-5 sm:px-7 py-5 border-b border-white/[0.06]">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -105,7 +171,7 @@ export default function BoardPage() {
             <div className="flex items-center gap-2 mb-[6px]">
               <div className="flex items-center gap-1 text-[10px] font-medium px-2 py-[3px] rounded-[5px] bg-ok/[0.06] text-ok border border-ok/[0.15]">
                 <div className="w-[5px] h-[5px] rounded-full bg-ok animate-pulse" />
-                {connectedCount}/{MAX_CONNECTIONS} connected
+                Live
               </div>
               <div className="bg-s2 text-t3 border border-white/[0.06] text-[10px] px-2 py-[3px] rounded-[5px] font-medium">
                 Free board
@@ -118,19 +184,13 @@ export default function BoardPage() {
 
           <div className="flex gap-[6px]">
             <button
-              aria-label="Show QR code"
-              className="px-[11px] py-[6px] bg-s2 border border-white/10 rounded-[7px] text-t2 text-[11px] font-medium hover:border-[var(--ac-glow)] transition-all"
-            >
-              QR
-            </button>
-            <button
               onClick={copyLink}
               className="px-[11px] py-[6px] bg-s2 border border-white/10 rounded-[7px] text-t2 text-[11px] font-medium hover:border-[var(--ac-glow)] transition-all"
             >
               {copied ? 'Copied' : 'Copy link'}
             </button>
             <button
-              onClick={() => { setText(''); setFiles([]); }}
+              onClick={clearAll}
               className="px-[11px] py-[6px] bg-s2 border border-danger/20 rounded-[7px] text-danger text-[11px] font-medium hover:border-danger/40 transition-all"
             >
               Clear all
@@ -139,7 +199,6 @@ export default function BoardPage() {
         </div>
       </header>
 
-      {/* Board body */}
       <main className="flex-1 px-5 sm:px-7 py-[22px]">
         {/* Text slot */}
         <section aria-label="Shared text" className="mb-8">
@@ -149,18 +208,12 @@ export default function BoardPage() {
           <div className="bg-s1 border border-white/[0.06] rounded-xl overflow-hidden">
             <div className="relative px-4 py-4 min-h-[88px]">
               <div className="flex items-center gap-1 text-[10px] text-ok absolute top-3 right-3">
-                <div className="w-[4px] h-[4px] rounded-full bg-ok animate-pulse" />
-                synced
+                <div className={`w-[4px] h-[4px] rounded-full bg-ok ${synced ? '' : 'opacity-40'}`} />
+                {synced ? 'synced' : 'syncing...'}
               </div>
               <textarea
                 value={text}
-                onChange={(e) => {
-                const val = e.target.value;
-                setText(val);
-                if (wsRef.current?.readyState === WebSocket.OPEN) {
-                  wsRef.current.send(JSON.stringify({ type: 'text', text: val }));
-                }
-              }}
+                onChange={(e) => handleTextChange(e.target.value)}
                 placeholder="Start typing - changes sync to all connected devices instantly"
                 aria-label="Shared board text"
                 className="w-full bg-transparent outline-none resize-none text-t2 text-[13px] leading-relaxed pr-16 min-h-[80px]"
@@ -169,7 +222,7 @@ export default function BoardPage() {
             <div className="flex items-center justify-between px-[14px] py-2 border-t border-white/[0.06]">
               <span className="text-[10px] text-t3">{text.length} characters</span>
               <button
-                onClick={() => setText('')}
+                onClick={() => { setText(''); pushText(''); }}
                 className="text-[10px] text-t3 hover:text-t1 transition-colors bg-transparent border-none"
               >
                 Clear
@@ -184,78 +237,104 @@ export default function BoardPage() {
             Files - any type, 25 MB max, expiry per file
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-[10px]">
-            {displaySlots.map((slot, i) =>
-              slot ? (
-                <div
-                  key={slot.id}
-                  className="bg-s1 border border-white/10 rounded-xl p-5 flex flex-col items-center gap-2 min-h-[148px] text-center relative"
-                >
-                  {/* Expiry badge */}
+            {displaySlots.map((slot, i) => {
+              if (slot) {
+                const label = expiryLabel(slot.expiresAt);
+                const isWarn = label !== 'never' && !label.startsWith('7d') && !label.startsWith('30d');
+                return (
                   <div
-                    className={`absolute top-2 right-2 text-[9px] px-[6px] py-[2px] rounded border font-semibold ${
-                      slot.isWarn
-                        ? 'bg-warn/[0.07] text-warn border-warn/[0.18]'
-                        : 'bg-ok/[0.06] text-ok border-ok/[0.12]'
-                    }`}
+                    key={slot.id}
+                    className="bg-s1 border border-white/10 rounded-xl p-5 flex flex-col items-center gap-2 min-h-[148px] text-center relative"
                   >
-                    {slot.expiry}
+                    <div className={`absolute top-2 right-2 text-[9px] px-[6px] py-[2px] rounded border font-semibold ${
+                      isWarn ? 'bg-warn/[0.07] text-warn border-warn/[0.18]' : 'bg-ok/[0.06] text-ok border-ok/[0.12]'
+                    }`}>
+                      {label}
+                    </div>
+                    <div className="font-mono text-[11px] font-semibold text-t3 bg-s3 px-2 py-[3px] rounded mt-2">
+                      {slot.ext}
+                    </div>
+                    <div className="text-[11px] font-medium text-t1 break-all">{slot.name}</div>
+                    <div className="text-[10px] text-t3">{slot.size}</div>
+                    <div className="mt-auto flex gap-2">
+                      <a
+                        href={slot.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-[12px] py-[6px] bg-s3 border border-white/10 rounded-[6px] text-t1 text-[10px] font-semibold hover:border-[var(--ac-glow)] transition-all"
+                      >
+                        Download
+                      </a>
+                      <button
+                        onClick={() => removeFile(slot)}
+                        aria-label={`Remove ${slot.name}`}
+                        className="px-[8px] py-[6px] bg-s3 border border-white/10 rounded-[6px] text-t3 text-[10px] hover:text-danger hover:border-danger/20 transition-all"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </div>
+                );
+              }
 
-                  {/* File type badge */}
-                  <div className="font-mono text-[11px] font-semibold text-t3 bg-s3 px-2 py-[3px] rounded mt-2">
-                    {slot.ext}
-                  </div>
+              const uploadId = Object.keys(uploading)[0];
+              const isUploading = i === files.length && uploadId !== undefined;
 
-                  <div className="text-[11px] font-medium text-t1 break-all">{slot.name}</div>
-                  <div className="text-[10px] text-t3">{slot.size}</div>
-
-                  <div className="mt-auto flex gap-2">
-                    <button className="px-[12px] py-[6px] bg-s3 border border-white/10 rounded-[6px] text-t1 text-[10px] font-semibold hover:border-[var(--ac-glow)] transition-all">
-                      Download
-                    </button>
-                    <button
-                      onClick={() => removeFile(slot.id)}
-                      aria-label={`Remove ${slot.name}`}
-                      className="px-[8px] py-[6px] bg-s3 border border-white/10 rounded-[6px] text-t3 text-[10px] hover:text-danger hover:border-danger/20 transition-all"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              ) : (
+              return (
                 <label
                   key={`empty-${i}`}
-                  className="bg-s1 border border-dashed border-white/10 rounded-xl p-5 flex flex-col items-center gap-2 min-h-[148px] text-center hover:border-[var(--ac-glow)] transition-all cursor-pointer"
+                  className={`bg-s1 border border-dashed rounded-xl p-5 flex flex-col items-center gap-2 min-h-[148px] text-center transition-all cursor-pointer ${
+                    files.length >= 3 ? 'opacity-40 cursor-not-allowed border-white/10' : 'border-white/10 hover:border-[var(--ac-glow)]'
+                  }`}
                 >
                   <input
                     type="file"
                     onChange={handleUpload}
                     className="sr-only"
+                    disabled={files.length >= 3}
                     aria-label="Upload file to board"
                   />
-                  <div className="w-8 h-8 rounded-lg bg-s3 border border-white/10 flex items-center justify-center mt-2">
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                      <path d="M7 1v8M4 4l3-3 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M1 10v1.5A1.5 1.5 0 002.5 13h9a1.5 1.5 0 001.5-1.5V10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-                    </svg>
-                  </div>
-                  <div className="text-[11px] text-t3">Drop any file</div>
-                  <div className="text-[10px] text-t3 leading-[1.7]">PDF, Excel, Word, image, ZIP, any</div>
-                  <select
-                    value={expiry}
-                    onClick={(e) => e.preventDefault()}
-                    onChange={(e) => setExpiry(e.target.value as ExpiryValue)}
-                    className="w-full mt-auto px-2 py-[6px] bg-s3 border border-white/10 rounded-[6px] text-t2 text-[10px] appearance-none cursor-pointer"
-                  >
-                    <option value="1h">Expires: 1 hour</option>
-                    <option value="24h">Expires: 24 hours</option>
-                    <option value="7d">Expires: 7 days</option>
-                    <option value="30d">Expires: 30 days</option>
-                    <option value="never">Never</option>
-                  </select>
+                  {isUploading ? (
+                    <>
+                      <div className="w-8 h-8 rounded-lg bg-s3 border border-white/10 flex items-center justify-center mt-2">
+                        <div className="w-3 h-3 rounded-full border-2 border-ac border-t-transparent animate-spin" />
+                      </div>
+                      <div className="text-[11px] text-t2">Uploading...</div>
+                      <div className="w-full bg-s3 rounded-full h-1 mt-1">
+                        <div
+                          className="bg-ac h-1 rounded-full transition-all"
+                          style={{ width: `${uploading[uploadId]}%` }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-t3">{uploading[uploadId]}%</div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-8 h-8 rounded-lg bg-s3 border border-white/10 flex items-center justify-center mt-2">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                          <path d="M7 1v8M4 4l3-3 3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M1 10v1.5A1.5 1.5 0 002.5 13h9a1.5 1.5 0 001.5-1.5V10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                        </svg>
+                      </div>
+                      <div className="text-[11px] text-t3">Drop any file</div>
+                      <div className="text-[10px] text-t3 leading-[1.7]">PDF, image, ZIP, any</div>
+                      <select
+                        value={expiry}
+                        onClick={(e) => e.preventDefault()}
+                        onChange={(e) => setExpiry(e.target.value as ExpiryValue)}
+                        className="w-full mt-auto px-2 py-[6px] bg-s3 border border-white/10 rounded-[6px] text-t2 text-[10px] appearance-none cursor-pointer"
+                      >
+                        <option value="1h">Expires: 1 hour</option>
+                        <option value="24h">Expires: 24 hours</option>
+                        <option value="7d">Expires: 7 days</option>
+                        <option value="30d">Expires: 30 days</option>
+                        <option value="never">Never</option>
+                      </select>
+                    </>
+                  )}
                 </label>
-              )
-            )}
+              );
+            })}
           </div>
         </section>
       </main>
