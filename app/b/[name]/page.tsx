@@ -61,22 +61,59 @@ export default function BoardPage() {
   const [synced, setSynced] = useState(true);
 
   const textDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const expiryTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const isRemote = useRef(false);
 
   const boardRef = doc(db, 'boards', boardName);
 
+  const purgeFile = useCallback(async (slot: FileSlot, currentFiles: FileSlot[]) => {
+    const updated = currentFiles.filter((f) => f.id !== slot.id);
+    try { await deleteObject(ref(storage, slot.storagePath)); } catch {}
+    await updateDoc(boardRef, { files: updated }).catch(() => {});
+  }, [boardName]);
+
   useEffect(() => {
-    const unsub = onSnapshot(boardRef, (snap) => {
+    const unsub = onSnapshot(boardRef, async (snap) => {
       if (!snap.exists()) return;
       const data = snap.data();
       isRemote.current = true;
       setText(data.text ?? '');
+
       const now = Date.now();
-      const live = (data.files ?? []).filter((f: FileSlot) => !f.expiresAt || f.expiresAt > now);
+      const all: FileSlot[] = data.files ?? [];
+      const expired = all.filter((f) => f.expiresAt && f.expiresAt <= now);
+      const live = all.filter((f) => !f.expiresAt || f.expiresAt > now);
+
+      // Delete expired files immediately
+      if (expired.length > 0) {
+        for (const f of expired) {
+          try { await deleteObject(ref(storage, f.storagePath)); } catch {}
+        }
+        await updateDoc(boardRef, { files: live }).catch(() => {});
+      }
+
       setFiles(live);
       setSynced(true);
+
+      // Schedule auto-removal for files expiring in the future
+      live.forEach((f) => {
+        if (!f.expiresAt) return;
+        const delay = f.expiresAt - Date.now();
+        if (delay <= 0) return;
+        if (expiryTimers.current[f.id]) clearTimeout(expiryTimers.current[f.id]);
+        expiryTimers.current[f.id] = setTimeout(() => {
+          setFiles((prev) => {
+            purgeFile(f, prev);
+            return prev.filter((x) => x.id !== f.id);
+          });
+        }, delay);
+      });
     });
-    return () => unsub();
+
+    return () => {
+      unsub();
+      Object.values(expiryTimers.current).forEach(clearTimeout);
+    };
   }, [boardName]);
 
   const pushText = useCallback((val: string) => {

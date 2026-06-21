@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
@@ -10,115 +9,96 @@ function generateBoardName(): string {
   return Array.from({ length: 6 }, () => CHARS[Math.floor(Math.random() * CHARS.length)]).join('');
 }
 
+function sanitize(val: string): string {
+  return val.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 32);
+}
+
 export default function BoardGenerator() {
   const router = useRouter();
-  const [boardName, setBoardName] = useState<string>('');
-  const [passwordEnabled, setPasswordEnabled] = useState<boolean>(false);
-  const [joining, setJoining] = useState(false);
+  const [boardName, setBoardName] = useState('');
   const [joinInput, setJoinInput] = useState('');
+  const [joining, setJoining] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     setBoardName(generateBoardName());
   }, []);
 
   const handleCreate = () => {
-    if (boardName) router.push(`/b/${boardName}`);
+    const name = boardName.trim();
+    if (!name) { setError('Enter a board name'); return; }
+    router.push(`/b/${name}`);
   };
 
   const handleJoin = () => {
-    const code = joinInput.trim().toUpperCase();
+    const code = sanitize(joinInput.trim());
     if (code) router.push(`/b/${code}`);
   };
 
   return (
     <div className="mx-auto w-full max-w-[400px]">
-      {/* Board Name Box */}
-      <div className="mb-[10px] flex items-center gap-[10px] rounded-xl border border-white/10 bg-[#111115] p-[14px_16px]">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={boardName}
-            initial={{ opacity: 0, scale: 0.94 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.94 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 28 }}
-            className="flex-1 font-mono font-semibold text-[17px] text-[#FAFAFA]"
-          >
-            {boardName}
-          </motion.div>
-        </AnimatePresence>
-        <button
-          onClick={() => setBoardName(generateBoardName())}
-          className="flex h-[30px] w-[30px] items-center justify-center rounded-[7px] border border-white/10 bg-[#222228] text-[#52525B] text-sm transition-colors hover:border-white/20 hover:text-t2"
-          aria-label="Refresh board name"
-        >
-          &#8635;
-        </button>
-      </div>
-
-      {/* Password Toggle Row */}
-      <div className="mb-4 flex items-center justify-center gap-[6px] text-[11px] text-[#52525B]">
-        <button
-          onClick={() => setPasswordEnabled(!passwordEnabled)}
-          className="relative h-[14px] w-[26px] cursor-pointer rounded-full border border-white/[0.06] bg-[#222228] transition-colors"
-          aria-label="Toggle password protection"
-          aria-pressed={passwordEnabled}
-        >
-          <div
-            className={`absolute top-[2px] h-[9px] w-[9px] rounded-full transition-all ${
-              passwordEnabled ? 'right-[2px] bg-ac' : 'left-[2px] bg-[#52525B]'
-            }`}
+      {/* Board name - editable */}
+      <div className="mb-2">
+        <label className="text-[10px] font-semibold text-t3 uppercase tracking-[0.08em] mb-[6px] block">
+          Board name / key
+        </label>
+        <div className="flex items-center gap-[8px] rounded-xl border border-white/10 bg-s1 p-[12px_14px]">
+          <input
+            value={boardName}
+            onChange={(e) => { setBoardName(sanitize(e.target.value)); setError(''); }}
+            onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+            placeholder="my-board or auto-generated"
+            className="flex-1 font-mono font-semibold text-[17px] text-t1 bg-transparent outline-none placeholder-t3 min-w-0"
+            aria-label="Board name"
           />
-        </button>
-        {passwordEnabled ? (
-          <>
-            <span>Password protected</span>
-            <span className="text-white/10">·</span>
-            <span>Enhanced security</span>
-          </>
-        ) : (
-          <>
-            <span>Add password protection</span>
-            <span className="text-white/10">·</span>
-            <span>Free &amp; open by default</span>
-          </>
-        )}
+          <button
+            onClick={() => { setBoardName(generateBoardName()); setError(''); }}
+            className="flex h-[30px] w-[30px] items-center justify-center rounded-[7px] border border-white/10 bg-s3 text-t3 text-sm transition-colors hover:border-white/20 hover:text-t2 flex-shrink-0"
+            aria-label="Generate random name"
+            title="Generate random"
+          >
+            &#8635;
+          </button>
+        </div>
+        {error && <p className="mt-1 text-[11px] text-danger">{error}</p>}
+        <p className="mt-[5px] text-[10px] text-t3">Type your own key or use the generated one</p>
       </div>
 
-      {/* Join input (shown when joining) */}
+      {/* Join input */}
       {joining && (
         <div className="mb-[10px] flex gap-2">
           <input
             autoFocus
             value={joinInput}
-            onChange={(e) => setJoinInput(e.target.value.toUpperCase().slice(0, 8))}
+            onChange={(e) => setJoinInput(sanitize(e.target.value))}
             onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-            placeholder="Enter board code..."
-            className="flex-1 rounded-[7px] border border-white/10 bg-[#111115] px-3 py-[10px] font-mono text-[15px] text-[#FAFAFA] placeholder-[#52525B] outline-none focus:border-white/20"
+            placeholder="Enter board name or key..."
+            className="flex-1 rounded-[7px] border border-white/10 bg-s1 px-3 py-[10px] font-mono text-[14px] text-t1 placeholder-t3 outline-none focus:border-white/20"
           />
           <button
             onClick={handleJoin}
             disabled={!joinInput.trim()}
-            className="rounded-[7px] border border-white/10 px-4 py-[10px] text-[13px] text-[#A1A1AA] transition-colors hover:border-white/20 hover:text-[#FAFAFA] disabled:opacity-40"
+            className="rounded-[7px] border border-white/10 px-4 py-[10px] text-[13px] text-t2 transition-colors hover:border-white/20 hover:text-t1 disabled:opacity-40"
           >
             Go
           </button>
         </div>
       )}
 
-      {/* Buttons Row */}
+      {/* Action buttons */}
       <div className="flex gap-2">
         <button
           onClick={handleCreate}
-          className="flex-1 rounded-[7px] bg-[#F97316] py-[10px] text-[13px] font-semibold text-white transition-colors hover:bg-[#EA8C15] active:scale-[0.97]"
+          className="flex-1 rounded-[7px] bg-ac py-[10px] text-[13px] font-semibold text-white transition-colors hover:bg-[#EA8C15] active:scale-[0.97]"
         >
-          Create this board
+          Create board
         </button>
         <button
           onClick={() => { setJoining(!joining); setJoinInput(''); }}
           className={`flex-1 rounded-[7px] border py-[10px] text-[13px] transition-colors active:scale-[0.97] ${
             joining
-              ? 'border-white/20 text-[#FAFAFA]'
-              : 'border-white/10 text-[#A1A1AA] hover:border-white/20 hover:text-[#FAFAFA]'
+              ? 'border-white/20 text-t1'
+              : 'border-white/10 text-t2 hover:border-white/20 hover:text-t1'
           }`}
         >
           {joining ? 'Cancel' : 'Join existing'}
