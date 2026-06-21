@@ -28,7 +28,7 @@ export default function BoardGenerator() {
         onKeyDown={(e) => e.key === 'Enter' && open()}
         spellCheck={false}
         autoComplete="off"
-        placeholder="e.g. team-standup"
+        placeholder="your-board-name"
         aria-label="Board name"
         className="mb-2 w-full rounded-xl border border-white/10 bg-s1 px-5 py-4 font-mono text-[20px] font-bold uppercase tracking-[0.06em] text-t1 placeholder:normal-case placeholder:tracking-normal placeholder:text-t3/40 outline-none transition-colors focus:border-[var(--ac-glow)]"
       />
