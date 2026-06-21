@@ -33,9 +33,8 @@ export default function Nav() {
         </Link>
 
         <div className="hidden sm:flex items-center gap-8">
-          <Link href="/boards" className="text-t3 text-xs hover:text-t1 transition-colors">Boards</Link>
+          <Link href="/" className="text-t3 text-xs hover:text-t1 transition-colors">Boards</Link>
           <Link href="/tools" className="text-t3 text-xs hover:text-t1 transition-colors">Tools</Link>
-          <Link href="/about" className="text-t3 text-xs hover:text-t1 transition-colors">About</Link>
         </div>
 
         <Link

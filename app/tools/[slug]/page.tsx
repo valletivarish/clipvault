@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import JsonLd from '@/components/JsonLd';
+import AdUnit from '@/components/AdUnit';
 import { TOOLS, SITE_URL, buildMetadata, toolJsonLd, breadcrumbJsonLd } from '@/lib/seo';
 
 import QrGenerator from '@/components/tools/QrGenerator';
@@ -166,17 +167,13 @@ export default async function ToolPage({
         </div>
       </header>
 
-      <div className="px-7 py-[9px] border-b border-white/[0.06] text-center text-[10px] text-t3 tracking-[0.04em]">
-        Advertisement
-      </div>
+      <AdUnit slot="1234567890" format="horizontal" className="w-full py-[9px] border-b border-white/[0.06]" />
 
       <main className="flex-1 px-5 sm:px-7 py-[22px]">
         <Component />
       </main>
 
-      <div className="px-7 py-[9px] border-t border-white/[0.06] text-center text-[10px] text-t3 tracking-[0.04em]">
-        Advertisement
-      </div>
+      <AdUnit slot="0987654321" format="horizontal" className="w-full py-[9px] border-t border-white/[0.06]" />
 
       <Footer />
     </div>

@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
+import AdUnit from '@/components/AdUnit';
 import { db, storage } from '@/lib/firebase';
 import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
@@ -256,7 +257,7 @@ export default function BoardPage() {
                 placeholder="Start typing - changes sync to all connected devices instantly"
                 aria-label="Shared board text"
                 maxLength={65000}
-                className="w-full bg-transparent outline-none resize-none text-t1 text-[13px] leading-relaxed pr-20 min-h-[260px]"
+                className="w-full bg-transparent outline-none resize-y text-t1 text-[13px] leading-relaxed pr-20 min-h-[180px] max-h-[70vh] overflow-y-auto"
               />
             </div>
             <div className="flex items-center justify-between px-5 py-[10px] border-t border-white/[0.06]">
@@ -381,9 +382,7 @@ export default function BoardPage() {
         </section>
       </main>
 
-      <div className="px-7 py-[9px] border-t border-white/[0.06] text-center text-[10px] text-t3 tracking-[0.04em]">
-        Advertisement
-      </div>
+      <AdUnit slot="1122334455" format="horizontal" className="w-full py-[9px] border-t border-white/[0.06]" />
 
       <Footer />
     </div>
