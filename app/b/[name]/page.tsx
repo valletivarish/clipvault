@@ -243,24 +243,27 @@ export default function BoardPage() {
             Text - live sync, never expires
           </div>
           <div className="bg-s1 border border-white/[0.06] rounded-xl overflow-hidden">
-            <div className="relative px-4 py-4 min-h-[88px]">
-              <div className="flex items-center gap-1 text-[10px] text-ok absolute top-3 right-3">
+            <div className="relative px-5 py-4">
+              <div className="flex items-center gap-1 text-[10px] text-ok absolute top-4 right-4">
                 <div className={`w-[4px] h-[4px] rounded-full bg-ok ${synced ? '' : 'opacity-40'}`} />
                 {synced ? 'synced' : 'syncing...'}
               </div>
               <textarea
                 value={text}
-                onChange={(e) => handleTextChange(e.target.value)}
+                onChange={(e) => handleTextChange(e.target.value.slice(0, 65000))}
                 placeholder="Start typing - changes sync to all connected devices instantly"
                 aria-label="Shared board text"
-                className="w-full bg-transparent outline-none resize-none text-t2 text-[13px] leading-relaxed pr-16 min-h-[80px]"
+                maxLength={65000}
+                className="w-full bg-transparent outline-none resize-none text-t1 text-[15px] leading-[1.75] pr-20 min-h-[260px]"
               />
             </div>
-            <div className="flex items-center justify-between px-[14px] py-2 border-t border-white/[0.06]">
-              <span className="text-[10px] text-t3">{text.length} characters</span>
+            <div className="flex items-center justify-between px-5 py-[10px] border-t border-white/[0.06]">
+              <span className={`text-[11px] font-mono ${text.length >= 65000 ? 'text-danger' : text.length > 60000 ? 'text-warn' : 'text-t3'}`}>
+                {text.length.toLocaleString()} / 65,000
+              </span>
               <button
                 onClick={() => { setText(''); pushText(''); }}
-                className="text-[10px] text-t3 hover:text-t1 transition-colors bg-transparent border-none"
+                className="text-[11px] text-t3 hover:text-t1 transition-colors bg-transparent border-none"
               >
                 Clear
               </button>
