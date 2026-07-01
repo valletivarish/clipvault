@@ -9,6 +9,22 @@ interface KeyPair {
   privateKeyPem: string;
 }
 
+async function importPublicKeyFromPem(pem: string): Promise<CryptoKey> {
+  const b64 = pem
+    .replace(/-----BEGIN PUBLIC KEY-----/, '')
+    .replace(/-----END PUBLIC KEY-----/, '')
+    .replace(/\s+/g, '');
+  if (!b64) throw new Error('Empty key');
+  const raw = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+  return crypto.subtle.importKey(
+    'spki',
+    raw.buffer,
+    { name: 'RSA-OAEP', hash: 'SHA-256' },
+    true,
+    ['encrypt']
+  );
+}
+
 export default function RsaCrypto() {
   const [keyPair, setKeyPair] = useState<KeyPair | null>(null);
   const [loading, setLoading] = useState(false);
@@ -16,6 +32,8 @@ export default function RsaCrypto() {
 
   // Encrypt state
   const [message, setMessage] = useState('');
+  const [encryptKeyPem, setEncryptKeyPem] = useState('');
+  const [encryptError, setEncryptError] = useState('');
   const [ciphertext, setCiphertext] = useState('');
   const [encryptLoading, setEncryptLoading] = useState(false);
 
@@ -52,6 +70,7 @@ export default function RsaCrypto() {
         publicKeyPem: pubPem,
         privateKeyPem: privPem,
       });
+      setEncryptKeyPem(pubPem);
       setCiphertext('');
       setPlaintext('');
     } catch (error) {
@@ -62,12 +81,14 @@ export default function RsaCrypto() {
   };
 
   const handleEncrypt = async () => {
-    if (!message.trim() || !keyPair) return;
+    if (!message.trim() || !encryptKeyPem.trim()) return;
     setEncryptLoading(true);
+    setEncryptError('');
     try {
+      const publicKey = await importPublicKeyFromPem(encryptKeyPem);
       const enc = await crypto.subtle.encrypt(
         { name: 'RSA-OAEP' },
-        keyPair.publicKey,
+        publicKey,
         new TextEncoder().encode(message)
       );
       const cipherB64 = btoa(String.fromCharCode(...new Uint8Array(enc)));
@@ -75,6 +96,8 @@ export default function RsaCrypto() {
       setPlaintext('');
     } catch (error) {
       console.error('Encryption error:', error);
+      setCiphertext('');
+      setEncryptError('Invalid public key - paste a valid RSA public key in PEM format (-----BEGIN PUBLIC KEY-----)');
     } finally {
       setEncryptLoading(false);
     }
@@ -114,10 +137,10 @@ export default function RsaCrypto() {
 
       <p className="text-[12px] text-[#A1A1AA] mb-6 leading-relaxed">
         RSA uses two keys: a <span className="text-[#FAFAFA] font-semibold">public key</span> anyone can use to encrypt a message,
-        and a <span className="text-[#FAFAFA] font-semibold">private key</span> only you can use to decrypt it. Generating a pair
-        below and testing encrypt/decrypt together lets you verify the round-trip locally &mdash; in real use you'd share your
-        public key with someone else so they can send you something only you can read (paste their public key into the encrypt
-        step instead of your own), or send your public key out and keep the private key secret to receive encrypted messages back.
+        and a <span className="text-[#FAFAFA] font-semibold">private key</span> only you can use to decrypt it. To receive encrypted
+        messages, generate a key pair below and share your public key &mdash; keep the private key secret. To send someone else a
+        message only they can read, paste <span className="text-[#FAFAFA] font-semibold">their</span> public key into the Encrypt
+        section instead of generating your own; you don't need a key pair of your own just to send.
       </p>
 
       {/* Key Generation Section */}
@@ -187,13 +210,34 @@ export default function RsaCrypto() {
       </div>
 
       {/* Encrypt Section */}
-      {keyPair && (
-        <div className="mb-8 pb-8 border-b border-white/10">
+      <div className="mb-8 pb-8 border-b border-white/10">
           <h2 className="text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-4">
             Encrypt
           </h2>
 
           <div className="space-y-4">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
+                  Public key to encrypt with
+                </label>
+                {keyPair && (
+                  <button
+                    onClick={() => setEncryptKeyPem(keyPair.publicKeyPem)}
+                    className="text-[10px] text-[#F97316] hover:text-[#EA6C0A] font-semibold"
+                  >
+                    Use my own key
+                  </button>
+                )}
+              </div>
+              <textarea
+                value={encryptKeyPem}
+                onChange={(e) => setEncryptKeyPem(e.target.value)}
+                placeholder="Paste a public key here - yours (generate one above) or someone else's&#10;-----BEGIN PUBLIC KEY-----..."
+                className="w-full bg-[#18181C] border border-white/10 rounded-[7px] px-3 py-2 text-[#FAFAFA] text-sm font-mono outline-none focus:border-[#F97316]/40 transition-colors resize-none h-24"
+              />
+            </div>
+
             <div>
               <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-2">
                 Message
@@ -206,9 +250,13 @@ export default function RsaCrypto() {
               />
             </div>
 
+            {encryptError && (
+              <p className="text-[11px] text-[#F43F5E]">{encryptError}</p>
+            )}
+
             <button
               onClick={handleEncrypt}
-              disabled={encryptLoading || !message.trim()}
+              disabled={encryptLoading || !message.trim() || !encryptKeyPem.trim()}
               className="bg-[#F97316] text-[#09090B] px-4 py-2 rounded-[7px] text-sm font-semibold hover:bg-[#EA6C0A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full"
             >
               {encryptLoading ? 'Encrypting...' : 'Encrypt with public key'}
@@ -236,7 +284,6 @@ export default function RsaCrypto() {
             )}
           </div>
         </div>
-      )}
 
       {/* Decrypt Section */}
       {keyPair && (
@@ -299,7 +346,7 @@ export default function RsaCrypto() {
       {!keyPair && (
         <div className="p-6 rounded-[7px] bg-[#18181C] border border-white/10 text-center">
           <p className="text-[#A1A1AA] text-sm">
-            Generate a key pair to begin encryption and decryption
+            Generate a key pair above to decrypt messages sent to you - or just paste someone else's public key into Encrypt to send them one
           </p>
         </div>
       )}
