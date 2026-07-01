@@ -8,7 +8,7 @@ interface AdUnitProps {
   className?: string;
 }
 
-const PUB_ID = 'ca-pub-XXXXXXXXXXXXXXXX'; // replace with your AdSense publisher ID
+const PUB_ID = 'ca-pub-1337359381374895';
 
 export default function AdUnit({ slot, format = 'auto', className = '' }: AdUnitProps) {
   const ref = useRef<HTMLModElement>(null);
@@ -21,14 +21,6 @@ export default function AdUnit({ slot, format = 'auto', className = '' }: AdUnit
       ((window as unknown as Record<string, unknown>).adsbygoogle as unknown[] ?? []).push({});
     } catch {}
   }, []);
-
-  if (PUB_ID === 'ca-pub-XXXXXXXXXXXXXXXX') {
-    return (
-      <div className={`flex items-center justify-center bg-s2 border border-white/[0.04] text-t3 text-[10px] tracking-[0.06em] ${className}`}>
-        Advertisement
-      </div>
-    );
-  }
 
   return (
     <div className={className}>
