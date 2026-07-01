@@ -9,26 +9,68 @@ interface KeyPair {
   privateKeyPem: string;
 }
 
+class PublicKeyImportError extends Error {}
+
 async function importPublicKeyFromPem(pem: string): Promise<CryptoKey> {
-  const b64 = pem
-    .replace(/-----BEGIN PUBLIC KEY-----/, '')
-    .replace(/-----END PUBLIC KEY-----/, '')
+  const trimmed = pem.trim();
+
+  if (!trimmed) {
+    throw new PublicKeyImportError('Paste a public key first.');
+  }
+  if (/-----BEGIN (RSA )?PRIVATE KEY-----/.test(trimmed)) {
+    throw new PublicKeyImportError(
+      'This is a private key, not a public key. Private keys are for decrypting - use a public key here instead (yours or the recipient\'s).'
+    );
+  }
+  if (/-----BEGIN CERTIFICATE-----/.test(trimmed)) {
+    throw new PublicKeyImportError('This looks like a certificate, not a public key.');
+  }
+  if (/-----BEGIN RSA PUBLIC KEY-----/.test(trimmed)) {
+    throw new PublicKeyImportError(
+      'This is a PKCS#1 key ("RSA PUBLIC KEY"). This tool needs a PKCS#8/SPKI key instead, starting with "-----BEGIN PUBLIC KEY-----".'
+    );
+  }
+  if (!/-----BEGIN PUBLIC KEY-----/.test(trimmed) || !/-----END PUBLIC KEY-----/.test(trimmed)) {
+    throw new PublicKeyImportError(
+      'Missing the "-----BEGIN PUBLIC KEY-----" / "-----END PUBLIC KEY-----" lines - the key looks incomplete. Use the Copy button instead of manually selecting the text.'
+    );
+  }
+
+  const b64 = trimmed
+    .replace('-----BEGIN PUBLIC KEY-----', '')
+    .replace('-----END PUBLIC KEY-----', '')
     .replace(/\s+/g, '');
-  if (!b64) throw new Error('Empty key');
-  const raw = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-  return crypto.subtle.importKey(
-    'spki',
-    raw.buffer,
-    { name: 'RSA-OAEP', hash: 'SHA-256' },
-    true,
-    ['encrypt']
-  );
+
+  let raw: Uint8Array<ArrayBuffer>;
+  try {
+    const binary = atob(b64);
+    raw = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) raw[i] = binary.charCodeAt(i);
+  } catch {
+    throw new PublicKeyImportError(
+      'The key content isn\'t valid - it looks like part of it is missing or was cut off. Use the Copy button instead of manually selecting the text.'
+    );
+  }
+
+  try {
+    return await crypto.subtle.importKey(
+      'spki',
+      raw,
+      { name: 'RSA-OAEP', hash: 'SHA-256' },
+      true,
+      ['encrypt']
+    );
+  } catch {
+    throw new PublicKeyImportError(
+      'The key data isn\'t a valid RSA public key - it may be incomplete (make sure you copied everything between and including the BEGIN/END lines) or corrupted.'
+    );
+  }
 }
 
 export default function RsaCrypto() {
   const [keyPair, setKeyPair] = useState<KeyPair | null>(null);
   const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   // Encrypt state
   const [message, setMessage] = useState('');
@@ -95,9 +137,13 @@ export default function RsaCrypto() {
       setCiphertext(cipherB64);
       setPlaintext('');
     } catch (error) {
-      console.error('Encryption error:', error);
       setCiphertext('');
-      setEncryptError('Invalid public key - paste a valid RSA public key in PEM format (-----BEGIN PUBLIC KEY-----)');
+      if (error instanceof PublicKeyImportError) {
+        setEncryptError(error.message);
+      } else {
+        console.error('Encryption error:', error);
+        setEncryptError('Encryption failed - please try again.');
+      }
     } finally {
       setEncryptLoading(false);
     }
@@ -125,10 +171,10 @@ export default function RsaCrypto() {
     }
   };
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField((cur) => (cur === field ? null : cur)), 2000);
   };
 
   return (
@@ -171,10 +217,10 @@ export default function RsaCrypto() {
                   className="flex-1 bg-[#18181C] border border-white/10 rounded-[7px] px-3 py-2 text-[#FAFAFA] text-sm font-mono outline-none resize-none h-24"
                 />
                 <button
-                  onClick={() => copyToClipboard(keyPair.publicKeyPem)}
+                  onClick={() => copyToClipboard(keyPair.publicKeyPem, 'public')}
                   className="border border-white/10 text-[#A1A1AA] px-3 py-2 rounded-[7px] text-sm hover:border-white/20 hover:text-[#FAFAFA] transition-colors font-semibold whitespace-nowrap"
                 >
-                  {copied ? 'Copied' : 'Copy'}
+                  {copiedField === 'public' ? 'Copied' : 'Copy'}
                 </button>
               </div>
             </div>
@@ -191,10 +237,10 @@ export default function RsaCrypto() {
                   className="flex-1 bg-[#18181C] border border-white/10 rounded-[7px] px-3 py-2 text-[#FAFAFA] text-sm font-mono outline-none resize-none h-24"
                 />
                 <button
-                  onClick={() => copyToClipboard(keyPair.privateKeyPem)}
+                  onClick={() => copyToClipboard(keyPair.privateKeyPem, 'private')}
                   className="border border-white/10 text-[#A1A1AA] px-3 py-2 rounded-[7px] text-sm hover:border-white/20 hover:text-[#FAFAFA] transition-colors font-semibold whitespace-nowrap"
                 >
-                  {copied ? 'Copied' : 'Copy'}
+                  {copiedField === 'private' ? 'Copied' : 'Copy'}
                 </button>
               </div>
               <p className="text-[10px] text-[#F59E0B] mt-1">
@@ -274,10 +320,10 @@ export default function RsaCrypto() {
                     className="flex-1 bg-[#18181C] border border-white/10 rounded-[7px] px-3 py-2 text-[#FAFAFA] text-sm font-mono outline-none resize-none h-20 break-all"
                   />
                   <button
-                    onClick={() => copyToClipboard(ciphertext)}
+                    onClick={() => copyToClipboard(ciphertext, 'ciphertext')}
                     className="border border-white/10 text-[#A1A1AA] px-3 py-2 rounded-[7px] text-sm hover:border-white/20 hover:text-[#FAFAFA] transition-colors font-semibold whitespace-nowrap"
                   >
-                    {copied ? 'Copied' : 'Copy'}
+                    {copiedField === 'ciphertext' ? 'Copied' : 'Copy'}
                   </button>
                 </div>
               </div>
@@ -330,10 +376,10 @@ export default function RsaCrypto() {
                   />
                   {plaintext !== '[Decryption failed]' && (
                     <button
-                      onClick={() => copyToClipboard(plaintext)}
+                      onClick={() => copyToClipboard(plaintext, 'plaintext')}
                       className="border border-white/10 text-[#A1A1AA] px-3 py-2 rounded-[7px] text-sm hover:border-white/20 hover:text-[#FAFAFA] transition-colors font-semibold whitespace-nowrap"
                     >
-                      {copied ? 'Copied' : 'Copy'}
+                      {copiedField === 'plaintext' ? 'Copied' : 'Copy'}
                     </button>
                   )}
                 </div>
