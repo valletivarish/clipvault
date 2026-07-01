@@ -65,7 +65,7 @@ export default function ToolsClient() {
     <>
       <header className="border-b border-white/[0.06] py-8">
         <div className="mx-auto w-full max-w-5xl px-5 sm:px-7">
-          <div className="text-[10px] font-semibold text-t3 uppercase tracking-[0.1em] mb-[6px]">
+          <div className="text-[10px] font-semibold text-t3 tracking-[0.1em] mb-[6px]">
             Free tools
           </div>
           <h1 className="font-display text-[26px] sm:text-[30px] leading-[1.2] tracking-[-0.04em] mb-2">

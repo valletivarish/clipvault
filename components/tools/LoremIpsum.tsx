@@ -69,7 +69,7 @@ export default function LoremIpsum() {
         {/* Paragraphs Slider */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label className="text-[11px] text-[#A1A1AA] font-semibold uppercase tracking-wide">
+            <label className="text-[11px] text-[#A1A1AA] font-semibold tracking-wide">
               Paragraphs
             </label>
             <span className="text-[12px] text-[#F97316] font-semibold">{paragraphs}</span>
@@ -87,7 +87,7 @@ export default function LoremIpsum() {
         {/* Words Per Paragraph Slider */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label className="text-[11px] text-[#A1A1AA] font-semibold uppercase tracking-wide">
+            <label className="text-[11px] text-[#A1A1AA] font-semibold tracking-wide">
               Words per paragraph
             </label>
             <span className="text-[12px] text-[#F97316] font-semibold">{wordsPerParagraph}</span>

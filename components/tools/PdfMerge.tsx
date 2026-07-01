@@ -75,7 +75,7 @@ export default function PdfMerge() {
 
       {files.length > 0 && (
         <div className="space-y-2 mb-4">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-t3 mb-2">
+          <div className="text-[10px] font-semibold tracking-[0.08em] text-t3 mb-2">
             Files to merge ({files.length}) - drag to reorder
           </div>
           {files.map((f, i) => (

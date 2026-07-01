@@ -24,7 +24,7 @@ export default function AdUnit({ slot, format = 'auto', className = '' }: AdUnit
 
   if (PUB_ID === 'ca-pub-XXXXXXXXXXXXXXXX') {
     return (
-      <div className={`flex items-center justify-center bg-s2 border border-white/[0.04] text-t3 text-[10px] tracking-[0.06em] uppercase ${className}`}>
+      <div className={`flex items-center justify-center bg-s2 border border-white/[0.04] text-t3 text-[10px] tracking-[0.06em] ${className}`}>
         Advertisement
       </div>
     );

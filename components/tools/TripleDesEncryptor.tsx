@@ -106,7 +106,7 @@ export default function TripleDesEncryptor() {
         {tab === 'encrypt' ? (
           <>
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
                 Plaintext
               </label>
               <textarea
@@ -119,7 +119,7 @@ export default function TripleDesEncryptor() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
                 Key (24 characters)
               </label>
               <input
@@ -135,7 +135,7 @@ export default function TripleDesEncryptor() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
                 Mode
               </label>
               <select
@@ -155,7 +155,7 @@ export default function TripleDesEncryptor() {
         ) : (
           <>
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
                 Ciphertext
               </label>
               <textarea
@@ -168,7 +168,7 @@ export default function TripleDesEncryptor() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
                 Key (24 characters)
               </label>
               <input
@@ -184,7 +184,7 @@ export default function TripleDesEncryptor() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
                 Mode
               </label>
               <select

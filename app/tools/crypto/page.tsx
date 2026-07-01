@@ -69,7 +69,7 @@ export default function CryptoToolsPage() {
           <div className="py-4 px-3">
             {SIDEBAR.map((section) => (
               <div key={section.category} className="mb-5">
-                <div className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#52525B] px-2 mb-2">
+                <div className="text-[9px] font-semibold tracking-[0.1em] text-[#52525B] px-2 mb-2">
                   {section.category}
                 </div>
                 {section.tools.map((tool) => (

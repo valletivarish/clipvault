@@ -33,28 +33,28 @@ export default function WordCounter() {
             <div className="text-[22px] font-bold text-[#FAFAFA]" style={{ fontFamily: 'Syne' }}>
               {stats.words}
             </div>
-            <div className="text-[10px] text-[#52525B] uppercase tracking-wide">Words</div>
+            <div className="text-[10px] text-[#52525B] tracking-wide">Words</div>
           </div>
 
           <div className="bg-[#111115] border border-white/[0.06] rounded-lg p-3 text-center">
             <div className="text-[22px] font-bold text-[#FAFAFA]" style={{ fontFamily: 'Syne' }}>
               {stats.characters}
             </div>
-            <div className="text-[10px] text-[#52525B] uppercase tracking-wide">Characters</div>
+            <div className="text-[10px] text-[#52525B] tracking-wide">Characters</div>
           </div>
 
           <div className="bg-[#111115] border border-white/[0.06] rounded-lg p-3 text-center">
             <div className="text-[22px] font-bold text-[#FAFAFA]" style={{ fontFamily: 'Syne' }}>
               {stats.sentences}
             </div>
-            <div className="text-[10px] text-[#52525B] uppercase tracking-wide">Sentences</div>
+            <div className="text-[10px] text-[#52525B] tracking-wide">Sentences</div>
           </div>
 
           <div className="bg-[#111115] border border-white/[0.06] rounded-lg p-3 text-center">
             <div className="text-[22px] font-bold text-[#FAFAFA]" style={{ fontFamily: 'Syne' }}>
               {stats.readingTime}
             </div>
-            <div className="text-[10px] text-[#52525B] uppercase tracking-wide">Min Read</div>
+            <div className="text-[10px] text-[#52525B] tracking-wide">Min Read</div>
           </div>
         </div>
       </div>

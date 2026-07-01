@@ -58,7 +58,7 @@ export default function TimestampConverter() {
     <div className="w-full max-w-2xl mx-auto p-6 space-y-6">
       {/* Current Timestamp Display */}
       <div className="bg-[#111115] rounded-xl p-5 text-center">
-        <p className="text-[#A1A1AA] text-xs mb-2 uppercase tracking-wide">
+        <p className="text-[#A1A1AA] text-xs mb-2 tracking-wide">
           Current Unix Timestamp
         </p>
         <p className="font-mono text-2xl text-[#FAFAFA]">{currentTimestamp}</p>

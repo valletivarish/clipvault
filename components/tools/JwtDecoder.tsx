@@ -209,7 +209,7 @@ function SectionCard({
     <div className="rounded-xl border border-white/[0.06] bg-[#111115] overflow-hidden">
       <div className="flex items-center justify-between border-b border-white/[0.06] px-[14px] py-[9px]">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+          <span className="text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
             {label}
           </span>
           {badge}
@@ -269,7 +269,7 @@ export default function JwtDecoder() {
       {/* Input area */}
       <div className="rounded-xl border border-white/[0.06] bg-[#111115] overflow-hidden">
         <div className="border-b border-white/[0.06] px-[14px] py-[9px]">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+          <span className="text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
             JWT Token
           </span>
         </div>

@@ -64,7 +64,7 @@ export default function XmlFormatter() {
     <div className="w-full max-w-[900px] mx-auto">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.08em] text-t3">XML Input</label>
+          <label className="mb-2 block text-[10px] font-semibold tracking-[0.08em] text-t3">XML Input</label>
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
@@ -76,7 +76,7 @@ export default function XmlFormatter() {
         </div>
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="text-[10px] font-semibold uppercase tracking-[0.08em] text-t3">Output</label>
+            <label className="text-[10px] font-semibold tracking-[0.08em] text-t3">Output</label>
             {output && <button onClick={copy} className="text-[11px] text-t2 hover:text-t1 transition-colors">{copied ? 'Copied' : 'Copy'}</button>}
           </div>
           <textarea

@@ -48,7 +48,7 @@ export default function PasswordStrength() {
   return (
     <div className="w-full max-w-[560px] mx-auto space-y-5">
       <div className="relative">
-        <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.08em] text-t3">Password</label>
+        <label className="mb-1.5 block text-[10px] font-semibold tracking-[0.08em] text-t3">Password</label>
         <input
           type={show ? 'text' : 'password'}
           value={password}
@@ -69,7 +69,7 @@ export default function PasswordStrength() {
         <>
           <div>
             <div className="flex justify-between mb-1.5">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-t3">Strength</span>
+              <span className="text-[10px] font-semibold tracking-[0.08em] text-t3">Strength</span>
               <span className={`text-xs font-semibold ${result.color}`}>{result.level}</span>
             </div>
             <div className="h-1.5 w-full rounded-full bg-s3 overflow-hidden">
@@ -78,7 +78,7 @@ export default function PasswordStrength() {
           </div>
 
           <div className="bg-s2 border border-white/10 rounded-xl p-4 space-y-2">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-t3 mb-3">Checklist</div>
+            <div className="text-[10px] font-semibold tracking-[0.08em] text-t3 mb-3">Checklist</div>
             {result.checks.map(c => (
               <div key={c.label} className="flex items-center gap-2.5 text-xs">
                 <span className={c.pass ? 'text-ok' : 'text-t3'}>
@@ -95,7 +95,7 @@ export default function PasswordStrength() {
 
           {result.suggestions.length > 0 && (
             <div className="bg-warn/[0.06] border border-warn/20 rounded-xl p-4">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-warn mb-2">Suggestions</div>
+              <div className="text-[10px] font-semibold tracking-[0.08em] text-warn mb-2">Suggestions</div>
               <ul className="space-y-1">
                 {result.suggestions.map(s => (
                   <li key={s} className="text-xs text-t2">{s}</li>

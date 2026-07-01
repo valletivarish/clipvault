@@ -242,7 +242,7 @@ export default function FileBase64() {
           {/* Full Data URI Output */}
           {fileBase64 && (
             <div className="space-y-2">
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
                 Full Data URI (with prefix)
               </label>
               <div className="bg-[#111115] border border-white/[0.06] rounded-[7px] p-3 max-h-[150px] overflow-y-auto">
@@ -262,7 +262,7 @@ export default function FileBase64() {
           {/* Raw Base64 Output */}
           {rawBase64 && (
             <div className="space-y-2">
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
                 Raw Base64 (no prefix)
               </label>
               <div className="bg-[#111115] border border-white/[0.06] rounded-[7px] p-3 max-h-[150px] overflow-y-auto">
@@ -286,7 +286,7 @@ export default function FileBase64() {
         <div className="space-y-4">
           {/* Base64 Input */}
           <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+            <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
               Base64 String
             </label>
             <textarea
@@ -300,7 +300,7 @@ export default function FileBase64() {
 
           {/* Filename Input */}
           <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+            <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
               Filename
             </label>
             <input
@@ -314,7 +314,7 @@ export default function FileBase64() {
 
           {/* MIME Type Input */}
           <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+            <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
               MIME Type
             </label>
             <input

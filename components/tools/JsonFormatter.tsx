@@ -54,7 +54,7 @@ export default function JsonFormatter() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* LEFT COLUMN - INPUT */}
         <div>
-          <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+          <label className="mb-2 block text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
             Input
           </label>
 
@@ -91,7 +91,7 @@ export default function JsonFormatter() {
         {/* RIGHT COLUMN - OUTPUT */}
         <div>
           <div className="mb-2 flex items-center gap-[7px]">
-            <label className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+            <label className="text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
               Output
             </label>
             {isValid === true && (

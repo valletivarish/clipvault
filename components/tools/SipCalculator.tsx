@@ -78,7 +78,7 @@ export default function SipCalculator() {
       <div className="bg-[#111115] border border-white/[0.06] rounded-xl p-5 mb-4">
         {/* Monthly Investment */}
         <div className="mb-4">
-          <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+          <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
             Monthly Investment
           </label>
           <input
@@ -95,7 +95,7 @@ export default function SipCalculator() {
 
         {/* Annual Return */}
         <div className="mb-4">
-          <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+          <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
             Expected Annual Return %
           </label>
           <input
@@ -113,7 +113,7 @@ export default function SipCalculator() {
 
         {/* Investment Period */}
         <div className="mb-4">
-          <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+          <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
             Investment Period (Years)
           </label>
           <input
@@ -133,7 +133,7 @@ export default function SipCalculator() {
           <div className="space-y-6">
             {/* Total Amount Invested */}
             <div>
-              <div className="text-[11px] text-[#A1A1AA] uppercase tracking-[0.06em] mb-2">
+              <div className="text-[11px] text-[#A1A1AA] tracking-[0.06em] mb-2">
                 Total Amount Invested
               </div>
               <div className="text-[28px] font-bold text-[#FAFAFA] font-mono">
@@ -143,7 +143,7 @@ export default function SipCalculator() {
 
             {/* Estimated Returns */}
             <div>
-              <div className="text-[11px] text-[#A1A1AA] uppercase tracking-[0.06em] mb-2">
+              <div className="text-[11px] text-[#A1A1AA] tracking-[0.06em] mb-2">
                 Estimated Returns
               </div>
               <div className="text-[28px] font-bold text-[#22C55E] font-mono">
@@ -153,7 +153,7 @@ export default function SipCalculator() {
 
             {/* Total Value at Maturity */}
             <div className="border-t border-white/[0.06] pt-6">
-              <div className="text-[11px] text-[#A1A1AA] uppercase tracking-[0.06em] mb-2">
+              <div className="text-[11px] text-[#A1A1AA] tracking-[0.06em] mb-2">
                 Total Value at Maturity
               </div>
               <div className="text-[40px] font-bold text-[#F97316] font-mono">

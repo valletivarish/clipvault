@@ -1,6 +1,5 @@
-import { db, storage } from './firebase';
+import { db } from './firebase';
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { ref, deleteObject } from 'firebase/storage';
 
 interface FileSlot {
   id: string;
@@ -26,9 +25,13 @@ export async function runGlobalCleanup(): Promise<void> {
 
       if (expired.length === 0) continue;
 
-      for (const f of expired) {
-        try { await deleteObject(ref(storage, f.storagePath)); } catch {}
-      }
+      try {
+        await fetch('/api/board-delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ storagePaths: expired.map((f) => f.storagePath) }),
+        });
+      } catch {}
 
       const nextCleanupAt = live.length > 0
         ? Math.min(...live.filter((f) => f.expiresAt).map((f) => f.expiresAt as number))

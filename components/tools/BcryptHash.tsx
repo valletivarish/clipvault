@@ -54,7 +54,7 @@ export default function BcryptHash() {
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-[#111115] rounded-lg border border-white/10">
-      <h1 className="text-lg font-bold text-[#FAFAFA] mb-6">BCRYPT HASH GENERATOR</h1>
+      <h1 className="text-lg font-bold text-[#FAFAFA] mb-6">Bcrypt Hash Generator</h1>
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6 border-b border-white/10">
@@ -66,7 +66,7 @@ export default function BcryptHash() {
               : 'text-[#A1A1AA] hover:text-[#FAFAFA]'
           }`}
         >
-          HASH
+          Hash
         </button>
         <button
           onClick={() => setActiveTab('verify')}
@@ -76,7 +76,7 @@ export default function BcryptHash() {
               : 'text-[#A1A1AA] hover:text-[#FAFAFA]'
           }`}
         >
-          VERIFY
+          Verify
         </button>
       </div>
 
@@ -84,8 +84,8 @@ export default function BcryptHash() {
       {activeTab === 'hash' && (
         <div className="space-y-4">
           <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-2">
-              PLAINTEXT
+            <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-2">
+              Plaintext
             </label>
             <textarea
               value={plaintext}
@@ -96,18 +96,18 @@ export default function BcryptHash() {
           </div>
 
           <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-2">
-              SALT ROUNDS
+            <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-2">
+              Salt rounds
             </label>
             <select
               value={saltRounds}
               onChange={(e) => setSaltRounds(Number(e.target.value))}
               className="w-full bg-[#18181C] border border-white/10 rounded-[7px] px-3 py-2 text-[#FAFAFA] text-sm font-mono outline-none focus:border-[#F97316]/40 transition-colors"
             >
-              <option value={8}>8 ROUNDS</option>
-              <option value={10}>10 ROUNDS</option>
-              <option value={12}>12 ROUNDS</option>
-              <option value={14}>14 ROUNDS</option>
+              <option value={8}>8 rounds</option>
+              <option value={10}>10 rounds</option>
+              <option value={12}>12 rounds</option>
+              <option value={14}>14 rounds</option>
             </select>
           </div>
 
@@ -116,13 +116,13 @@ export default function BcryptHash() {
             disabled={loading || !plaintext.trim()}
             className="bg-[#F97316] text-[#09090B] px-4 py-2 rounded-[7px] text-sm font-semibold hover:bg-[#EA6C0A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full"
           >
-            {loading ? 'GENERATING...' : 'GENERATE HASH'}
+            {loading ? 'Generating...' : 'Generate hash'}
           </button>
 
           {hashOutput && (
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-2">
-                HASH OUTPUT
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-2">
+                Hash output
               </label>
               <div className="flex gap-2">
                 <textarea
@@ -134,7 +134,7 @@ export default function BcryptHash() {
                   onClick={() => copyToClipboard(hashOutput)}
                   className="border border-white/10 text-[#A1A1AA] px-3 py-2 rounded-[7px] text-sm hover:border-white/20 hover:text-[#FAFAFA] transition-colors font-semibold whitespace-nowrap"
                 >
-                  {copied ? 'COPIED' : 'COPY'}
+                  {copied ? 'Copied' : 'Copy'}
                 </button>
               </div>
             </div>
@@ -146,8 +146,8 @@ export default function BcryptHash() {
       {activeTab === 'verify' && (
         <div className="space-y-4">
           <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-2">
-              PLAINTEXT
+            <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-2">
+              Plaintext
             </label>
             <textarea
               value={verifyPlaintext}
@@ -158,8 +158,8 @@ export default function BcryptHash() {
           </div>
 
           <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-2">
-              HASH TO VERIFY
+            <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-2">
+              Hash to verify
             </label>
             <textarea
               value={verifyHash}
@@ -174,7 +174,7 @@ export default function BcryptHash() {
             disabled={loading || !verifyPlaintext.trim() || !verifyHash.trim()}
             className="bg-[#F97316] text-[#09090B] px-4 py-2 rounded-[7px] text-sm font-semibold hover:bg-[#EA6C0A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full"
           >
-            {loading ? 'VERIFYING...' : 'VERIFY'}
+            {loading ? 'Verifying...' : 'Verify'}
           </button>
 
           {verifyResult && (
@@ -185,7 +185,7 @@ export default function BcryptHash() {
                   : 'bg-[#F43F5E]/10 text-[#F43F5E] border border-[#F43F5E]/20'
               }`}
             >
-              {verifyResult === 'match' ? 'MATCH' : 'NO MATCH'}
+              {verifyResult === 'match' ? 'Match' : 'No match'}
             </div>
           )}
         </div>

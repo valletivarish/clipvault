@@ -95,7 +95,7 @@ export default function QrGenerator() {
             {qrCode === "placeholder" ? (
               // Placeholder while library loads
               <div className="w-[200px] h-[200px] bg-white rounded-lg flex items-center justify-center text-[10px] text-black text-center p-2 font-mono">
-                <span>QR CODE<br />(integration pending)</span>
+                <span>QR Code<br />(integration pending)</span>
               </div>
             ) : (
               // Actual QR code

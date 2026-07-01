@@ -120,7 +120,7 @@ export default function RegexTester() {
 
       {/* Pattern Row */}
       <div>
-        <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+        <label className="mb-2 block text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
           Pattern
         </label>
         <div className="rounded-xl border border-white/[0.06] bg-[#111115] overflow-hidden">
@@ -140,7 +140,7 @@ export default function RegexTester() {
 
           {/* Flags bar */}
           <div className="flex items-center gap-2 border-t border-white/[0.06] px-[14px] py-[9px]">
-            <span className="text-[10px] text-[#52525B] mr-1 uppercase tracking-widest font-semibold">Flags</span>
+            <span className="text-[10px] text-[#52525B] mr-1 tracking-widest font-semibold">Flags</span>
             {(['g', 'i', 'm'] as const).map((flag) => (
               <button
                 key={flag}
@@ -176,7 +176,7 @@ export default function RegexTester() {
 
       {/* Test string */}
       <div>
-        <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+        <label className="mb-2 block text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
           Test String
         </label>
         <div className="rounded-xl border border-white/[0.06] bg-[#111115] overflow-hidden">
@@ -205,7 +205,7 @@ export default function RegexTester() {
         <div>
           {/* Match count badge */}
           <div className="mb-3 flex items-center gap-2">
-            <label className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+            <label className="text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
               Results
             </label>
             {!regexError && (
@@ -227,7 +227,7 @@ export default function RegexTester() {
               {/* Highlighted test string */}
               <div className="rounded-xl border border-white/[0.06] bg-[#111115] overflow-hidden mb-3">
                 <div className="px-[14px] pt-[10px] pb-[4px]">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+                  <span className="text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
                     Highlighted
                   </span>
                 </div>
@@ -256,7 +256,7 @@ export default function RegexTester() {
               {matchCount > 0 && (
                 <div className="rounded-xl border border-white/[0.06] bg-[#111115] overflow-hidden">
                   <div className="px-[14px] pt-[10px] pb-[4px]">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+                    <span className="text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
                       Match Details
                     </span>
                   </div>
@@ -305,7 +305,7 @@ export default function RegexTester() {
 
       {/* Replace section */}
       <div>
-        <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+        <label className="mb-2 block text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
           Replace
         </label>
         <div className="rounded-xl border border-white/[0.06] bg-[#111115] overflow-hidden mb-3">
@@ -325,7 +325,7 @@ export default function RegexTester() {
         {hasPattern && testString && !regexError && (
           <div className="rounded-xl border border-white/[0.06] bg-[#111115] overflow-hidden">
             <div className="px-[14px] pt-[10px] pb-[4px]">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+              <span className="text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
                 Result
               </span>
             </div>

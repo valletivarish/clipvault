@@ -51,7 +51,7 @@ export default function UuidGenerator() {
       {/* History */}
       {history.length > 0 && (
         <div className="bg-[#111115] border border-white/[0.06] rounded-xl p-4">
-          <div className="text-[10px] text-[#52525B] uppercase tracking-wide font-semibold mb-3">
+          <div className="text-[10px] text-[#52525B] tracking-wide font-semibold mb-3">
             History (last 5)
           </div>
           <div className="space-y-2">

@@ -5,12 +5,24 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import AdUnit from '@/components/AdUnit';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { slugifyBoardName } from '@/lib/board';
 import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 
-type ExpiryValue = '1h' | '24h' | '7d' | '30d' | 'never';
+const MAX_FILE_SIZE = 25 * 1024 * 1024;
+
+async function deleteR2Files(storagePaths: string[]): Promise<void> {
+  if (!storagePaths.length) return;
+  try {
+    await fetch('/api/board-delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ storagePaths }),
+    });
+  } catch {}
+}
+
+type ExpiryValue = '1h' | '24h';
 
 interface FileSlot {
   id: string;
@@ -44,9 +56,9 @@ function expiryLabel(expiresAt: number | null): string {
   return `${m}m`;
 }
 
-function expiryMs(val: ExpiryValue): number | null {
-  const map: Record<ExpiryValue, number | null> = {
-    '1h': 3600000, '24h': 86400000, '7d': 604800000, '30d': 2592000000, 'never': null,
+function expiryMs(val: ExpiryValue): number {
+  const map: Record<ExpiryValue, number> = {
+    '1h': 3600000, '24h': 86400000,
   };
   return map[val];
 }
@@ -96,7 +108,7 @@ export default function BoardPage() {
   const purgeFile = useCallback(async (slot: FileSlot, currentFiles: FileSlot[]) => {
     if (!boardRef) return;
     const updated = currentFiles.filter((f) => f.id !== slot.id);
-    try { await deleteObject(ref(storage, slot.storagePath)); } catch {}
+    await deleteR2Files([slot.storagePath]);
     await updateDoc(boardRef, { files: updated }).catch(() => {});
   }, [boardName]);
 
@@ -214,49 +226,63 @@ export default function BoardPage() {
     const f = e.target.files?.[0];
     if (!f || files.length >= 3) return;
     e.target.value = '';
+    if (f.size > MAX_FILE_SIZE) return;
 
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-    const storagePath = `boards/${boardName}/${id}-${f.name}`;
-    const storageRef = ref(storage, storagePath);
     const ms = expiryMs(expiry);
-
-    const newSlot: FileSlot = {
-      id, name: f.name, ext: extFromName(f.name),
-      size: `${(f.size / 1024 / 1024).toFixed(1)} MB`,
-      url: '', storagePath,
-      expiresAt: ms ? Date.now() + ms : null,
-    };
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const contentType = f.type || 'application/octet-stream';
 
     setUploading((prev) => ({ ...prev, [id]: 0 }));
-    const task = uploadBytesResumable(storageRef, f);
 
-    task.on('state_changed',
-      (snap) => {
-        const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
-        setUploading((prev) => ({ ...prev, [id]: pct }));
-      },
-      () => { setUploading((prev) => { const n = { ...prev }; delete n[id]; return n; }); },
-      async () => {
-        const url = await getDownloadURL(task.snapshot.ref);
-        const finalized = { ...newSlot, url };
-        setUploading((prev) => { const n = { ...prev }; delete n[id]; return n; });
-        const updatedFiles = [...files, finalized];
-        const nextCleanupAt = updatedFiles
-          .filter((f) => f.expiresAt)
-          .reduce((min, f) => Math.min(min, f.expiresAt!), Infinity);
-        await updateDoc(boardRef, {
-          files: updatedFiles,
-          nextCleanupAt: isFinite(nextCleanupAt) ? nextCleanupAt : null,
-        }).catch(() => setDoc(boardRef, { text, files: updatedFiles, nextCleanupAt: isFinite(nextCleanupAt) ? nextCleanupAt : null }));
-      }
-    );
+    try {
+      const presignRes = await fetch('/api/board-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ boardName, fileName: f.name, contentType }),
+      });
+      if (!presignRes.ok) throw new Error('Failed to get upload URL');
+      const { uploadUrl, storagePath, publicUrl } = await presignRes.json();
+
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.upload.onprogress = (evt) => {
+          if (!evt.lengthComputable) return;
+          setUploading((prev) => ({ ...prev, [id]: Math.round((evt.loaded / evt.total) * 100) }));
+        };
+        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Upload failed: ${xhr.status}`)));
+        xhr.onerror = () => reject(new Error('Upload failed'));
+        xhr.open('PUT', uploadUrl);
+        xhr.setRequestHeader('Content-Type', contentType);
+        xhr.send(f);
+      });
+
+      const finalized: FileSlot = {
+        id, name: f.name, ext: extFromName(f.name),
+        size: `${(f.size / 1024 / 1024).toFixed(1)} MB`,
+        url: publicUrl, storagePath,
+        expiresAt: Date.now() + ms,
+      };
+
+      setUploading((prev) => { const n = { ...prev }; delete n[id]; return n; });
+      const updatedFiles = [...files, finalized];
+      const nextCleanupAt = updatedFiles
+        .filter((f) => f.expiresAt)
+        .reduce((min, f) => Math.min(min, f.expiresAt!), Infinity);
+      await updateDoc(boardRef, {
+        files: updatedFiles,
+        nextCleanupAt: isFinite(nextCleanupAt) ? nextCleanupAt : null,
+      }).catch(() => setDoc(boardRef, { text, files: updatedFiles, nextCleanupAt: isFinite(nextCleanupAt) ? nextCleanupAt : null }));
+    } catch (err) {
+      console.error('Upload error:', err);
+      setUploading((prev) => { const n = { ...prev }; delete n[id]; return n; });
+    }
   };
 
   const removeFile = async (slot: FileSlot) => {
     if (!isEditable || !boardRef) return;
     const updated = files.filter((f) => f.id !== slot.id);
     setFiles(updated);
-    try { await deleteObject(ref(storage, slot.storagePath)); } catch {}
+    await deleteR2Files([slot.storagePath]);
     const nextCleanupAt = updated.filter((f) => f.expiresAt)
       .reduce((min, f) => Math.min(min, f.expiresAt!), Infinity);
     await updateDoc(boardRef, {
@@ -267,9 +293,7 @@ export default function BoardPage() {
 
   const clearAll = async () => {
     if (!isEditable || !boardRef) return;
-    for (const f of files) {
-      try { await deleteObject(ref(storage, f.storagePath)); } catch {}
-    }
+    await deleteR2Files(files.map((f) => f.storagePath));
     setText('');
     setFiles([]);
     await setDoc(boardRef, { text: '', files: [], nextCleanupAt: null });
@@ -396,7 +420,7 @@ export default function BoardPage() {
       <main className="flex-1 px-5 sm:px-7 py-[22px]">
         {/* Text slot */}
         <section aria-label="Shared text" className="mb-8">
-          <div className="text-[10px] font-semibold text-t3 uppercase tracking-[0.08em] mb-[10px]">
+          <div className="text-[10px] font-semibold text-t3 tracking-[0.08em] mb-[10px]">
             Text - live sync, never expires
           </div>
           <div className={`bg-s1 border rounded-xl overflow-hidden ${!isEditable ? 'border-danger/20' : 'border-white/[0.06]'}`}>
@@ -432,7 +456,7 @@ export default function BoardPage() {
 
         {/* File slots */}
         <section aria-label="Shared files">
-          <div className="text-[10px] font-semibold text-t3 uppercase tracking-[0.08em] mb-[10px]">
+          <div className="text-[10px] font-semibold text-t3 tracking-[0.08em] mb-[10px]">
             Files - any type, 25 MB max, expiry per file
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-[10px]">
@@ -526,9 +550,6 @@ export default function BoardPage() {
                       >
                         <option value="1h">Expires: 1 hour</option>
                         <option value="24h">Expires: 24 hours</option>
-                        <option value="7d">Expires: 7 days</option>
-                        <option value="30d">Expires: 30 days</option>
-                        <option value="never">Never</option>
                       </select>
                     </>
                   )}

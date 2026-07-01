@@ -45,7 +45,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-bg text-t1">
+      <body className="min-h-screen flex flex-col bg-bg text-t1" suppressHydrationWarning>
         <FirebaseAnalytics />
         <CleanupWorker />
         {children}

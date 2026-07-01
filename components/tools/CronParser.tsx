@@ -243,7 +243,7 @@ export default function CronParser() {
       {/* Input */}
       <div className="bg-[#111115] border border-white/[0.06] rounded-xl overflow-hidden">
         <div className="px-[14px] py-[10px] border-b border-white/[0.06]">
-          <span className="text-[10px] font-semibold text-[#52525B] uppercase tracking-wider">
+          <span className="text-[10px] font-semibold text-[#52525B] tracking-wider">
             Cron Expression
           </span>
         </div>
@@ -270,7 +270,7 @@ export default function CronParser() {
 
       {/* Presets */}
       <div>
-        <p className="text-[10px] font-semibold text-[#52525B] uppercase tracking-wider mb-2 px-1">
+        <p className="text-[10px] font-semibold text-[#52525B] tracking-wider mb-2 px-1">
           Presets
         </p>
         <div className="flex flex-wrap gap-2">
@@ -295,7 +295,7 @@ export default function CronParser() {
           {/* Field descriptions */}
           <div className="bg-[#111115] border border-white/[0.06] rounded-xl overflow-hidden">
             <div className="px-[14px] py-[10px] border-b border-white/[0.06]">
-              <span className="text-[10px] font-semibold text-[#52525B] uppercase tracking-wider">
+              <span className="text-[10px] font-semibold text-[#52525B] tracking-wider">
                 Field Breakdown
               </span>
             </div>
@@ -317,7 +317,7 @@ export default function CronParser() {
           {/* Next runs */}
           <div className="bg-[#111115] border border-white/[0.06] rounded-xl overflow-hidden">
             <div className="px-[14px] py-[10px] border-b border-white/[0.06]">
-              <span className="text-[10px] font-semibold text-[#52525B] uppercase tracking-wider">
+              <span className="text-[10px] font-semibold text-[#52525B] tracking-wider">
                 Next 5 Run Times
               </span>
             </div>

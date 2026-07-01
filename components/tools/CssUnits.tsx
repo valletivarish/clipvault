@@ -85,7 +85,7 @@ export default function CssUnits() {
       {/* Config row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div>
-          <label className="block text-[10px] font-semibold text-[#52525B] uppercase tracking-wider mb-1">
+          <label className="block text-[10px] font-semibold text-[#52525B] tracking-wider mb-1">
             Root font (px)
           </label>
           <input
@@ -97,7 +97,7 @@ export default function CssUnits() {
           />
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-[#52525B] uppercase tracking-wider mb-1">
+          <label className="block text-[10px] font-semibold text-[#52525B] tracking-wider mb-1">
             Elem font (px)
           </label>
           <input
@@ -109,7 +109,7 @@ export default function CssUnits() {
           />
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-[#52525B] uppercase tracking-wider mb-1">
+          <label className="block text-[10px] font-semibold text-[#52525B] tracking-wider mb-1">
             Viewport W (px)
           </label>
           <input
@@ -121,7 +121,7 @@ export default function CssUnits() {
           />
         </div>
         <div>
-          <label className="block text-[10px] font-semibold text-[#52525B] uppercase tracking-wider mb-1">
+          <label className="block text-[10px] font-semibold text-[#52525B] tracking-wider mb-1">
             Viewport H (px)
           </label>
           <input
@@ -137,7 +137,7 @@ export default function CssUnits() {
       {/* Value + unit selector */}
       <div className="bg-[#111115] border border-white/[0.06] rounded-xl overflow-hidden">
         <div className="px-[14px] py-[10px] border-b border-white/[0.06]">
-          <span className="text-[10px] font-semibold text-[#52525B] uppercase tracking-wider">
+          <span className="text-[10px] font-semibold text-[#52525B] tracking-wider">
             Convert From
           </span>
         </div>
@@ -176,7 +176,7 @@ export default function CssUnits() {
               }`}
             >
               <span
-                className={`text-[10px] font-semibold uppercase tracking-wider w-10 shrink-0 ${
+                className={`text-[10px] font-semibold tracking-wider w-10 shrink-0 ${
                   isSource ? 'text-[#F97316]' : 'text-[#52525B]'
                 }`}
               >

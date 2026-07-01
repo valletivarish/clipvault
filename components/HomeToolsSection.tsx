@@ -60,7 +60,7 @@ export default function HomeToolsSection() {
   return (
     <section className="py-7 pb-10">
       <div className="mx-auto w-full max-w-5xl px-5 sm:px-7">
-        <div className="text-[10px] font-semibold text-t3 uppercase tracking-[0.1em] mb-[6px]">Free tools</div>
+        <div className="text-[10px] font-semibold text-t3 tracking-[0.1em] mb-[6px]">Free tools</div>
         <h2 className="font-display text-[22px] sm:text-[24px] tracking-[-0.03em] mb-1">100+ browser tools</h2>
         <p className="text-xs text-t3 mb-5">Everything runs in your browser. Nothing is sent to any server.</p>
 

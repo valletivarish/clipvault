@@ -84,7 +84,7 @@ export default function BoardPreview() {
       <div className="grid grid-cols-3">
         {/* Slot 1: PDF */}
         <div className="px-3 py-[10px] border-r border-white/[0.06]">
-          <div className="text-[9px] text-[#52525B] uppercase tracking-[0.07em] mb-[6px] font-medium">
+          <div className="text-[9px] text-[#52525B] tracking-[0.07em] mb-[6px] font-medium">
             File
           </div>
           <div className="flex items-center gap-1">
@@ -98,7 +98,7 @@ export default function BoardPreview() {
 
         {/* Slot 2: Excel */}
         <div className="px-3 py-[10px] border-r border-white/[0.06]">
-          <div className="text-[9px] text-[#52525B] uppercase tracking-[0.07em] mb-[6px] font-medium">
+          <div className="text-[9px] text-[#52525B] tracking-[0.07em] mb-[6px] font-medium">
             File
           </div>
           <div className="flex items-center gap-1">
@@ -112,7 +112,7 @@ export default function BoardPreview() {
 
         {/* Slot 3: Empty */}
         <div className="px-3 py-[10px]">
-          <div className="text-[9px] text-[#52525B] uppercase tracking-[0.07em] mb-[6px] font-medium">
+          <div className="text-[9px] text-[#52525B] tracking-[0.07em] mb-[6px] font-medium">
             File
           </div>
           <div className="text-[11px] text-[#52525B] border border-dashed border-white/[0.06] rounded-[5px] px-[7px] py-1 text-center">

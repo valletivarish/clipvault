@@ -124,7 +124,7 @@ export default function DiffChecker() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Original */}
         <div>
-          <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+          <label className="mb-2 block text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
             Original
           </label>
           <div className="rounded-xl border border-white/[0.06] bg-[#111115] overflow-hidden">
@@ -139,7 +139,7 @@ export default function DiffChecker() {
 
         {/* Modified */}
         <div>
-          <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+          <label className="mb-2 block text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
             Modified
           </label>
           <div className="rounded-xl border border-white/[0.06] bg-[#111115] overflow-hidden">
@@ -196,7 +196,7 @@ export default function DiffChecker() {
       {diff !== null && (
         <div className="mt-3 rounded-xl border border-white/[0.06] bg-[#111115] overflow-hidden">
           <div className="border-b border-white/[0.06] px-[14px] py-[9px] flex items-center gap-[6px]">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B]">
+            <span className="text-[10px] font-semibold tracking-[0.08em] text-[#52525B]">
               Unified Diff
             </span>
           </div>

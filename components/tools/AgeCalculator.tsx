@@ -82,7 +82,7 @@ export default function AgeCalculator() {
         <div className="grid grid-cols-2 gap-4 mb-4">
           {/* Date of Birth */}
           <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+            <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
               Date of Birth
             </label>
             <input
@@ -96,7 +96,7 @@ export default function AgeCalculator() {
 
           {/* Calculate As Of */}
           <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+            <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
               Calculate As Of (optional)
             </label>
             <input
@@ -134,14 +134,14 @@ export default function AgeCalculator() {
             <div className="text-[48px] font-bold text-[#F97316] font-mono">
               {result.years}
             </div>
-            <div className="text-[11px] text-[#52525B] uppercase tracking-[0.06em] mt-1">
+            <div className="text-[11px] text-[#52525B] tracking-[0.06em] mt-1">
               Years Old
             </div>
           </div>
 
           {/* Detailed Breakdown */}
           <div className="border-t border-white/[0.06] pt-4 mb-4">
-            <div className="text-[11px] text-[#A1A1AA] uppercase tracking-[0.06em] mb-2">
+            <div className="text-[11px] text-[#A1A1AA] tracking-[0.06em] mb-2">
               Full Breakdown
             </div>
             <div className="text-[14px] text-[#FAFAFA] font-mono">
@@ -151,7 +151,7 @@ export default function AgeCalculator() {
 
           {/* Next Birthday */}
           <div className="border-t border-white/[0.06] pt-4">
-            <div className="text-[11px] text-[#A1A1AA] uppercase tracking-[0.06em] mb-2">
+            <div className="text-[11px] text-[#A1A1AA] tracking-[0.06em] mb-2">
               Days Until Next Birthday
             </div>
             <div className="flex items-baseline gap-2">

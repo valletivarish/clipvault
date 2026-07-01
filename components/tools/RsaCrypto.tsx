@@ -96,7 +96,7 @@ export default function RsaCrypto() {
       setPlaintext(decrypted);
     } catch (error) {
       console.error('Decryption error:', error);
-      setPlaintext('[DECRYPTION FAILED]');
+      setPlaintext('[Decryption failed]');
     } finally {
       setDecryptLoading(false);
     }
@@ -110,12 +110,12 @@ export default function RsaCrypto() {
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-[#111115] rounded-lg border border-white/10">
-      <h1 className="text-lg font-bold text-[#FAFAFA] mb-6">RSA ENCRYPT DECRYPT</h1>
+      <h1 className="text-lg font-bold text-[#FAFAFA] mb-6">RSA Encrypt Decrypt</h1>
 
       {/* Key Generation Section */}
       <div className="mb-8 pb-8 border-b border-white/10">
-        <h2 className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-4">
-          KEY GENERATION
+        <h2 className="text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-4">
+          Key generation
         </h2>
 
         <button
@@ -123,15 +123,15 @@ export default function RsaCrypto() {
           disabled={loading}
           className="bg-[#F97316] text-[#09090B] px-4 py-2 rounded-[7px] text-sm font-semibold hover:bg-[#EA6C0A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full mb-4"
         >
-          {loading ? 'GENERATING KEY PAIR...' : 'GENERATE KEY PAIR'}
+          {loading ? 'Generating key pair...' : 'Generate key pair'}
         </button>
 
         {keyPair ? (
           <div className="space-y-4">
             {/* Public Key */}
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-2">
-                PUBLIC KEY
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-2">
+                Public key
               </label>
               <div className="flex gap-2">
                 <textarea
@@ -143,15 +143,15 @@ export default function RsaCrypto() {
                   onClick={() => copyToClipboard(keyPair.publicKeyPem)}
                   className="border border-white/10 text-[#A1A1AA] px-3 py-2 rounded-[7px] text-sm hover:border-white/20 hover:text-[#FAFAFA] transition-colors font-semibold whitespace-nowrap"
                 >
-                  {copied ? 'COPIED' : 'COPY'}
+                  {copied ? 'Copied' : 'Copy'}
                 </button>
               </div>
             </div>
 
             {/* Private Key */}
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-2">
-                PRIVATE KEY (PKCS8)
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-2">
+                Private key (PKCS8)
               </label>
               <div className="flex gap-2">
                 <textarea
@@ -163,7 +163,7 @@ export default function RsaCrypto() {
                   onClick={() => copyToClipboard(keyPair.privateKeyPem)}
                   className="border border-white/10 text-[#A1A1AA] px-3 py-2 rounded-[7px] text-sm hover:border-white/20 hover:text-[#FAFAFA] transition-colors font-semibold whitespace-nowrap"
                 >
-                  {copied ? 'COPIED' : 'COPY'}
+                  {copied ? 'Copied' : 'Copy'}
                 </button>
               </div>
               <p className="text-[10px] text-[#F59E0B] mt-1">
@@ -173,7 +173,7 @@ export default function RsaCrypto() {
           </div>
         ) : (
           <div className="p-4 rounded-[7px] bg-[#18181C] border border-white/10 text-[#A1A1AA] text-sm text-center">
-            NO KEY PAIR GENERATED
+            No key pair generated
           </div>
         )}
       </div>
@@ -181,14 +181,14 @@ export default function RsaCrypto() {
       {/* Encrypt Section */}
       {keyPair && (
         <div className="mb-8 pb-8 border-b border-white/10">
-          <h2 className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-4">
-            ENCRYPT
+          <h2 className="text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-4">
+            Encrypt
           </h2>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-2">
-                MESSAGE
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-2">
+                Message
               </label>
               <textarea
                 value={message}
@@ -203,13 +203,13 @@ export default function RsaCrypto() {
               disabled={encryptLoading || !message.trim()}
               className="bg-[#F97316] text-[#09090B] px-4 py-2 rounded-[7px] text-sm font-semibold hover:bg-[#EA6C0A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full"
             >
-              {encryptLoading ? 'ENCRYPTING...' : 'ENCRYPT WITH PUBLIC KEY'}
+              {encryptLoading ? 'Encrypting...' : 'Encrypt with public key'}
             </button>
 
             {ciphertext && (
               <div>
-                <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-2">
-                  CIPHERTEXT (BASE64)
+                <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-2">
+                  Ciphertext (Base64)
                 </label>
                 <div className="flex gap-2">
                   <textarea
@@ -221,7 +221,7 @@ export default function RsaCrypto() {
                     onClick={() => copyToClipboard(ciphertext)}
                     className="border border-white/10 text-[#A1A1AA] px-3 py-2 rounded-[7px] text-sm hover:border-white/20 hover:text-[#FAFAFA] transition-colors font-semibold whitespace-nowrap"
                   >
-                    {copied ? 'COPIED' : 'COPY'}
+                    {copied ? 'Copied' : 'Copy'}
                   </button>
                 </div>
               </div>
@@ -233,14 +233,14 @@ export default function RsaCrypto() {
       {/* Decrypt Section */}
       {keyPair && (
         <div>
-          <h2 className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-4">
-            DECRYPT
+          <h2 className="text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-4">
+            Decrypt
           </h2>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-2">
-                CIPHERTEXT (BASE64)
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-2">
+                Ciphertext (Base64)
               </label>
               <textarea
                 value={ciphertextInput}
@@ -255,30 +255,30 @@ export default function RsaCrypto() {
               disabled={decryptLoading || !ciphertextInput.trim()}
               className="bg-[#F97316] text-[#09090B] px-4 py-2 rounded-[7px] text-sm font-semibold hover:bg-[#EA6C0A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full"
             >
-              {decryptLoading ? 'DECRYPTING...' : 'DECRYPT WITH PRIVATE KEY'}
+              {decryptLoading ? 'Decrypting...' : 'Decrypt with private key'}
             </button>
 
             {plaintext && (
               <div>
-                <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-2">
-                  PLAINTEXT OUTPUT
+                <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-2">
+                  Plaintext output
                 </label>
                 <div className="flex gap-2">
                   <textarea
                     value={plaintext}
                     readOnly
                     className={`flex-1 bg-[#18181C] border rounded-[7px] px-3 py-2 text-sm font-mono outline-none resize-none h-20 ${
-                      plaintext === '[DECRYPTION FAILED]'
+                      plaintext === '[Decryption failed]'
                         ? 'border-[#F43F5E]/40 text-[#F43F5E]'
                         : 'border-white/10 text-[#FAFAFA]'
                     }`}
                   />
-                  {plaintext !== '[DECRYPTION FAILED]' && (
+                  {plaintext !== '[Decryption failed]' && (
                     <button
                       onClick={() => copyToClipboard(plaintext)}
                       className="border border-white/10 text-[#A1A1AA] px-3 py-2 rounded-[7px] text-sm hover:border-white/20 hover:text-[#FAFAFA] transition-colors font-semibold whitespace-nowrap"
                     >
-                      {copied ? 'COPIED' : 'COPY'}
+                      {copied ? 'Copied' : 'Copy'}
                     </button>
                   )}
                 </div>
@@ -291,7 +291,7 @@ export default function RsaCrypto() {
       {!keyPair && (
         <div className="p-6 rounded-[7px] bg-[#18181C] border border-white/10 text-center">
           <p className="text-[#A1A1AA] text-sm">
-            GENERATE A KEY PAIR TO BEGIN ENCRYPTION AND DECRYPTION
+            Generate a key pair to begin encryption and decryption
           </p>
         </div>
       )}

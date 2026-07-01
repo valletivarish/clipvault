@@ -102,11 +102,11 @@ export default function ImageResize() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.08em] text-t3">Width (px)</label>
+              <label className="mb-1.5 block text-[10px] font-semibold tracking-[0.08em] text-t3">Width (px)</label>
               <input type="number" value={width} onChange={e => onWidthChange(e.target.value)} className="w-full rounded-lg border border-white/[0.06] bg-s1 px-3 py-2 text-sm text-t1 font-mono outline-none focus:border-white/20" />
             </div>
             <div>
-              <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.08em] text-t3">Height (px)</label>
+              <label className="mb-1.5 block text-[10px] font-semibold tracking-[0.08em] text-t3">Height (px)</label>
               <input type="number" value={height} onChange={e => onHeightChange(e.target.value)} className="w-full rounded-lg border border-white/[0.06] bg-s1 px-3 py-2 text-sm text-t1 font-mono outline-none focus:border-white/20" />
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function ImageResize() {
           </label>
 
           <div>
-            <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.08em] text-t3">Output Format</label>
+            <label className="mb-1.5 block text-[10px] font-semibold tracking-[0.08em] text-t3">Output Format</label>
             <div className="flex gap-2">
               {(['image/jpeg', 'image/png', 'image/webp'] as const).map(f => (
                 <button key={f} onClick={() => setFormat(f)} className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${format === f ? 'bg-ac border-ac text-white' : 'border-white/10 text-t2 hover:border-white/20 hover:text-t1'}`}>
@@ -129,7 +129,7 @@ export default function ImageResize() {
 
           {format !== 'image/png' && (
             <div>
-              <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.08em] text-t3">Quality: {quality}%</label>
+              <label className="mb-1.5 block text-[10px] font-semibold tracking-[0.08em] text-t3">Quality: {quality}%</label>
               <input type="range" min={10} max={100} value={quality} onChange={e => setQuality(Number(e.target.value))} className="w-full accent-ac" />
             </div>
           )}

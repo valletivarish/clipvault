@@ -165,7 +165,7 @@ export default function ImageCompressor() {
         <>
           {/* File Info Card */}
           <div className="bg-[#111115] border border-white/10 rounded-lg p-4 space-y-2">
-            <p className="text-xs text-[#A1A1AA] uppercase tracking-wide">Original File</p>
+            <p className="text-xs text-[#A1A1AA] tracking-wide">Original File</p>
             <p className="text-sm text-[#FAFAFA] font-mono">{fileInfo?.name}</p>
             <p className="text-xs text-[#52525B]">
               {formatFileSize(fileInfo?.size || 0)} · {fileInfo?.type}
@@ -218,13 +218,13 @@ export default function ImageCompressor() {
               {/* Preview and Comparison */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-[#111115] border border-white/10 rounded-lg p-4 text-center">
-                  <p className="text-xs text-[#A1A1AA] mb-2 uppercase tracking-wide">Original</p>
+                  <p className="text-xs text-[#A1A1AA] mb-2 tracking-wide">Original</p>
                   <p className="text-sm font-mono text-[#FAFAFA]">
                     {formatFileSize(fileInfo?.size || 0)}
                   </p>
                 </div>
                 <div className="bg-[#111115] border border-white/10 rounded-lg p-4 text-center">
-                  <p className="text-xs text-[#A1A1AA] mb-2 uppercase tracking-wide">Compressed</p>
+                  <p className="text-xs text-[#A1A1AA] mb-2 tracking-wide">Compressed</p>
                   <p className="text-sm font-mono text-[#FAFAFA]">
                     {formatFileSize(compressedResult.size)}
                   </p>
@@ -233,7 +233,7 @@ export default function ImageCompressor() {
 
               {/* Savings */}
               <div className="bg-[#222228] border border-white/10 rounded-lg p-4 text-center">
-                <p className="text-xs text-[#A1A1AA] mb-1 uppercase tracking-wide">Space Saved</p>
+                <p className="text-xs text-[#A1A1AA] mb-1 tracking-wide">Space Saved</p>
                 <p className="text-lg font-semibold text-[#22C55E]">{savingsPercent}%</p>
               </div>
 

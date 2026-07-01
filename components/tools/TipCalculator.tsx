@@ -38,7 +38,7 @@ export default function TipCalculator() {
       <div className="bg-[#111115] border border-white/[0.06] rounded-xl p-5 mb-4">
         {/* Bill Amount */}
         <div className="mb-4">
-          <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+          <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
             Bill Amount
           </label>
           <input
@@ -53,7 +53,7 @@ export default function TipCalculator() {
 
         {/* Tip Percentage */}
         <div className="mb-4">
-          <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+          <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
             Tip Percentage
           </label>
           <div className="grid grid-cols-4 gap-2 mb-3">
@@ -101,7 +101,7 @@ export default function TipCalculator() {
 
         {/* Number of People */}
         <div>
-          <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+          <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
             Split Between (People)
           </label>
           <input
@@ -121,7 +121,7 @@ export default function TipCalculator() {
         <div className="space-y-5">
           {/* Tip Amount */}
           <div>
-            <div className="text-[11px] text-[#A1A1AA] uppercase tracking-[0.06em] mb-2">
+            <div className="text-[11px] text-[#A1A1AA] tracking-[0.06em] mb-2">
               Tip Amount ({tip}%)
             </div>
             <div className="text-[28px] font-bold text-[#F97316] font-mono">
@@ -131,7 +131,7 @@ export default function TipCalculator() {
 
           {/* Total Bill */}
           <div className="border-t border-white/[0.06] pt-5">
-            <div className="text-[11px] text-[#A1A1AA] uppercase tracking-[0.06em] mb-2">
+            <div className="text-[11px] text-[#A1A1AA] tracking-[0.06em] mb-2">
               Total Bill
             </div>
             <div className="text-[32px] font-bold text-[#FAFAFA] font-mono">
@@ -141,7 +141,7 @@ export default function TipCalculator() {
 
           {/* Per Person */}
           <div className="border-t border-white/[0.06] pt-5">
-            <div className="text-[11px] text-[#A1A1AA] uppercase tracking-[0.06em] mb-2">
+            <div className="text-[11px] text-[#A1A1AA] tracking-[0.06em] mb-2">
               Per Person ({people} {people === 1 ? 'person' : 'people'})
             </div>
             <div className="text-[32px] font-bold text-[#22C55E] font-mono">
@@ -151,7 +151,7 @@ export default function TipCalculator() {
 
           {/* Tip Per Person */}
           <div className="border-t border-white/[0.06] pt-5 pb-0">
-            <div className="text-[11px] text-[#A1A1AA] uppercase tracking-[0.06em] mb-2">
+            <div className="text-[11px] text-[#A1A1AA] tracking-[0.06em] mb-2">
               Tip Per Person
             </div>
             <div className="text-[20px] font-bold text-[#52525B] font-mono">

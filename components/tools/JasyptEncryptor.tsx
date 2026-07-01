@@ -111,7 +111,7 @@ export default function JasyptEncryptor() {
 
         {/* Plaintext Input */}
         <div>
-          <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+          <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
             Plaintext
           </label>
           <textarea
@@ -124,7 +124,7 @@ export default function JasyptEncryptor() {
 
         {/* Password Input */}
         <div>
-          <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+          <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
             Password
           </label>
           <input
@@ -147,7 +147,7 @@ export default function JasyptEncryptor() {
         {/* Ciphertext Output */}
         {ciphertext && (
           <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+            <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
               Ciphertext
             </label>
             <div className="bg-[#111115] border border-white/[0.06] rounded-[7px] px-3 py-3 text-[#F97316] text-xs font-mono min-h-[80px] break-all select-all overflow-y-auto max-h-[200px]">
@@ -169,7 +169,7 @@ export default function JasyptEncryptor() {
 
         {/* Ciphertext Input */}
         <div>
-          <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+          <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
             Ciphertext
           </label>
           <textarea
@@ -182,7 +182,7 @@ export default function JasyptEncryptor() {
 
         {/* Decrypt Password Input */}
         <div>
-          <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+          <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
             Password
           </label>
           <input
@@ -205,7 +205,7 @@ export default function JasyptEncryptor() {
         {/* Plaintext Output */}
         {decryptResult && (
           <div>
-            <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+            <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
               Plaintext
             </label>
             <div className="bg-[#111115] border border-white/[0.06] rounded-[7px] px-3 py-3 text-[#F97316] text-xs font-mono min-h-[80px] break-all select-all overflow-y-auto max-h-[200px]">

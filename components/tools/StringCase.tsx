@@ -99,7 +99,7 @@ export default function StringCase() {
     <div className="w-full space-y-4">
       <div className="bg-[#111115] border border-white/[0.06] rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-[14px] py-[10px] border-b border-white/[0.06]">
-          <span className="text-[10px] font-semibold text-[#52525B] uppercase tracking-wider">
+          <span className="text-[10px] font-semibold text-[#52525B] tracking-wider">
             Input
           </span>
           <span className="text-[10px] text-[#52525B]">

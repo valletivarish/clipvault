@@ -66,7 +66,7 @@ export default function CodeMinifier() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.08em] text-t3">Input</label>
+          <label className="mb-2 block text-[10px] font-semibold tracking-[0.08em] text-t3">Input</label>
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
@@ -78,7 +78,7 @@ export default function CodeMinifier() {
         </div>
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="text-[10px] font-semibold uppercase tracking-[0.08em] text-t3">
+            <label className="text-[10px] font-semibold tracking-[0.08em] text-t3">
               Minified{' '}
               {savings > 0 && <span className="text-ok normal-case tracking-normal font-medium ml-1">{savings}% smaller</span>}
             </label>

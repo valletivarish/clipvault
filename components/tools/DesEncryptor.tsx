@@ -103,7 +103,7 @@ export default function DesEncryptor() {
         {tab === 'encrypt' ? (
           <>
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
                 Plaintext
               </label>
               <textarea
@@ -116,7 +116,7 @@ export default function DesEncryptor() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
                 Key (8 characters)
               </label>
               <input
@@ -130,7 +130,7 @@ export default function DesEncryptor() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
                 Mode
               </label>
               <select
@@ -150,7 +150,7 @@ export default function DesEncryptor() {
         ) : (
           <>
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
                 Ciphertext
               </label>
               <textarea
@@ -163,7 +163,7 @@ export default function DesEncryptor() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
                 Key (8 characters)
               </label>
               <input
@@ -177,7 +177,7 @@ export default function DesEncryptor() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[#52525B] mb-[6px]">
+              <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
                 Mode
               </label>
               <select
