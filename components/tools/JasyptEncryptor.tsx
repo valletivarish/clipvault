@@ -4,6 +4,7 @@ import { useState } from 'react';
 import CryptoJS from 'crypto-js';
 
 export default function JasyptEncryptor() {
+  const [action, setAction] = useState<'encrypt' | 'decrypt'>('encrypt');
   const [plaintext, setPlaintext] = useState('');
   const [password, setPassword] = useState('');
   const [ciphertext, setCiphertext] = useState('');
@@ -105,10 +106,18 @@ export default function JasyptEncryptor() {
         </p>
       </div>
 
-      {/* Encrypt Section */}
-      <div className="space-y-4 mb-8 pb-8 border-b border-white/[0.06]">
-        <h3 className="text-[#FAFAFA] text-sm font-semibold">Encrypt</h3>
+      {/* Mode Selector */}
+      <select
+        value={action}
+        onChange={(e) => setAction(e.target.value as 'encrypt' | 'decrypt')}
+        className="mb-6 w-full bg-[#18181C] border border-white/10 rounded-[7px] px-3 py-2 text-[#FAFAFA] text-sm font-semibold outline-none focus:border-[#F97316]/40 transition-colors"
+      >
+        <option value="encrypt">Encrypt</option>
+        <option value="decrypt">Decrypt</option>
+      </select>
 
+      {action === 'encrypt' && (
+      <div className="space-y-4">
         {/* Plaintext Input */}
         <div>
           <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
@@ -162,11 +171,11 @@ export default function JasyptEncryptor() {
           </div>
         )}
       </div>
+      )}
 
       {/* Decrypt Section */}
+      {action === 'decrypt' && (
       <div className="space-y-4">
-        <h3 className="text-[#FAFAFA] text-sm font-semibold">Decrypt</h3>
-
         {/* Ciphertext Input */}
         <div>
           <label className="block text-[10px] font-semibold tracking-[0.08em] text-[#52525B] mb-[6px]">
@@ -220,6 +229,7 @@ export default function JasyptEncryptor() {
           </div>
         )}
       </div>
+      )}
 
       {/* Error Message */}
       {error && (

@@ -57,21 +57,14 @@ export default function HtmlEntities() {
 
   return (
     <div className="w-full">
-      <div className="flex gap-2 mb-4">
-        {(['encode', 'decode'] as Tab[]).map((t) => (
-          <button
-            key={t}
-            onClick={() => handleTabChange(t)}
-            className={`px-4 py-2 rounded-[7px] text-[11px] font-semibold transition-all capitalize ${
-              tab === t
-                ? 'bg-[#222228] text-[#FAFAFA]'
-                : 'text-[#A1A1AA] hover:text-[#FAFAFA]'
-            }`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      <select
+        value={tab}
+        onChange={(e) => handleTabChange(e.target.value as Tab)}
+        className="mb-4 bg-[#18181C] border border-white/10 rounded-[7px] px-4 py-2 text-[#FAFAFA] text-[11px] font-semibold outline-none focus:border-[#F97316]/40 transition-colors"
+      >
+        <option value="encode">Encode</option>
+        <option value="decode">Decode</option>
+      </select>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-[#111115] border border-white/[0.06] rounded-xl overflow-hidden flex flex-col">

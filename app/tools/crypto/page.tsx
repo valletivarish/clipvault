@@ -130,13 +130,6 @@ export default function CryptoToolsPage() {
             <h1 className="font-display font-bold text-[22px] sm:text-[26px] tracking-[-0.03em] mb-1">
               {activeTool.name}
             </h1>
-            <div className="flex items-center gap-[6px] text-[10px] font-semibold px-[9px] py-[3px] bg-[#22C55E]/[0.06] text-[#22C55E] rounded-[5px] border border-[#22C55E]/10 w-fit">
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-                <rect x="1.5" y="4" width="7" height="5" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none" />
-                <path d="M3 4V3a2 2 0 014 0v1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-              </svg>
-              Runs in your browser - nothing uploaded
-            </div>
           </div>
 
           {/* Tool component */}

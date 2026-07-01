@@ -157,13 +157,6 @@ export default async function ToolPage({
 
         <div className="flex items-center gap-[10px] flex-wrap">
           <p className="text-xs text-t2">{tool.description}</p>
-          <div className="flex items-center gap-[6px] text-[10px] font-semibold px-[9px] py-[3px] bg-ok/[0.06] text-ok rounded-[5px] border border-ok/10 whitespace-nowrap">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-              <rect x="1.5" y="4" width="7" height="5" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none"/>
-              <path d="M3 4V3a2 2 0 014 0v1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-            </svg>
-            Runs in your browser - nothing uploaded
-          </div>
         </div>
       </header>
 

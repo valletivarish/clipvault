@@ -79,24 +79,14 @@ export default function DesEncryptor() {
       <div className="space-y-3">
         <h3 className="text-sm font-semibold text-[#FAFAFA]">DES Encrypt / Decrypt</h3>
 
-        <div className="flex gap-2 border-b border-white/10">
-          <button
-            onClick={() => setTab('encrypt')}
-            className={`pb-3 text-sm font-medium transition-colors ${
-              tab === 'encrypt' ? 'text-[#F97316] border-b-2 border-[#F97316]' : 'text-[#A1A1AA] hover:text-[#FAFAFA]'
-            }`}
-          >
-            Encrypt
-          </button>
-          <button
-            onClick={() => setTab('decrypt')}
-            className={`pb-3 text-sm font-medium transition-colors ${
-              tab === 'decrypt' ? 'text-[#F97316] border-b-2 border-[#F97316]' : 'text-[#A1A1AA] hover:text-[#FAFAFA]'
-            }`}
-          >
-            Decrypt
-          </button>
-        </div>
+        <select
+          value={tab}
+          onChange={(e) => setTab(e.target.value as Tab)}
+          className="w-full bg-[#18181C] border border-white/10 rounded-[7px] px-3 py-2 text-[#FAFAFA] text-sm font-semibold outline-none focus:border-[#F97316]/40 transition-colors"
+        >
+          <option value="encrypt">Encrypt</option>
+          <option value="decrypt">Decrypt</option>
+        </select>
       </div>
 
       <div className="space-y-4">

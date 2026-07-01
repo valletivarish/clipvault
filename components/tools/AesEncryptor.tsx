@@ -10,6 +10,7 @@ function padKey(key: string, bits: 128 | 192 | 256): string {
 }
 
 export default function AesEncryptor() {
+  const [action, setAction] = useState<'encrypt' | 'decrypt'>('encrypt');
   const [plaintext, setPlaintext] = useState('');
   const [ciphertext, setCiphertext] = useState('');
   const [secretKey, setSecretKey] = useState('');
@@ -73,6 +74,15 @@ export default function AesEncryptor() {
     <div className="w-full max-w-2xl mx-auto p-6 bg-s1 rounded-lg border border-white/10">
       <h2 className="text-lg font-semibold text-t1 mb-6">AES Encrypt / Decrypt</h2>
 
+      <select
+        value={action}
+        onChange={(e) => setAction(e.target.value as 'encrypt' | 'decrypt')}
+        className="w-full mb-6 bg-s2 border border-white/10 rounded-[7px] px-3 py-2 text-t1 text-sm font-semibold outline-none focus:border-ac/40 transition-colors"
+      >
+        <option value="encrypt">Encrypt</option>
+        <option value="decrypt">Decrypt</option>
+      </select>
+
       <div className="space-y-4 mb-6">
         <div>
           <label className="block text-sm font-medium text-t2 mb-2">Secret Key</label>
@@ -129,8 +139,8 @@ export default function AesEncryptor() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mb-6">
-        <div>
+      {action === 'encrypt' ? (
+        <div className="mb-6">
           <label className="block text-sm font-medium text-t2 mb-2">Plaintext</label>
           <textarea
             value={plaintext}
@@ -139,33 +149,19 @@ export default function AesEncryptor() {
             rows={6}
             className="w-full bg-s2 border border-white/10 rounded-[7px] px-3 py-2 text-t1 text-sm font-mono outline-none focus:border-ac/40 transition-colors resize-none"
           />
-          <button
-            onClick={() => copyToClipboard(plaintext)}
-            disabled={!plaintext}
-            className="mt-2 border border-white/10 text-t2 px-3 py-1.5 rounded-[7px] text-xs hover:border-white/20 hover:text-t1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Copy
-          </button>
         </div>
-
-        <div>
+      ) : (
+        <div className="mb-6">
           <label className="block text-sm font-medium text-t2 mb-2">Ciphertext</label>
           <textarea
             value={ciphertext}
             onChange={(e) => setCiphertext(e.target.value)}
-            placeholder="Encrypted output will appear here"
+            placeholder="Paste ciphertext to decrypt"
             rows={6}
             className="w-full bg-s2 border border-white/10 rounded-[7px] px-3 py-2 text-t1 text-sm font-mono outline-none focus:border-ac/40 transition-colors resize-none"
           />
-          <button
-            onClick={() => copyToClipboard(ciphertext)}
-            disabled={!ciphertext}
-            className="mt-2 border border-white/10 text-t2 px-3 py-1.5 rounded-[7px] text-xs hover:border-white/20 hover:text-t1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Copy
-          </button>
         </div>
-      </div>
+      )}
 
       {error && (
         <div className="mb-4 p-3 bg-s2 border border-danger/30 rounded-[7px]">
@@ -173,20 +169,48 @@ export default function AesEncryptor() {
         </div>
       )}
 
-      <div className="flex gap-3">
-        <button
-          onClick={handleEncrypt}
-          className="bg-ac text-white px-4 py-2 rounded-[7px] text-sm font-semibold hover:bg-[#EA6C0A] transition-colors"
-        >
-          Encrypt
-        </button>
-        <button
-          onClick={handleDecrypt}
-          className="border border-white/10 text-t2 px-4 py-2 rounded-[7px] text-sm hover:border-white/20 hover:text-t1 transition-colors"
-        >
-          Decrypt
-        </button>
-      </div>
+      <button
+        onClick={action === 'encrypt' ? handleEncrypt : handleDecrypt}
+        className="bg-ac text-white px-4 py-2 rounded-[7px] text-sm font-semibold hover:bg-[#EA6C0A] transition-colors w-full"
+      >
+        {action === 'encrypt' ? 'Encrypt' : 'Decrypt'}
+      </button>
+
+      {action === 'encrypt' && ciphertext && (
+        <div className="mt-6">
+          <label className="block text-sm font-medium text-t2 mb-2">Ciphertext</label>
+          <textarea
+            value={ciphertext}
+            readOnly
+            rows={6}
+            className="w-full bg-s2 border border-white/10 rounded-[7px] px-3 py-2 text-t1 text-sm font-mono outline-none resize-none"
+          />
+          <button
+            onClick={() => copyToClipboard(ciphertext)}
+            className="mt-2 border border-white/10 text-t2 px-3 py-1.5 rounded-[7px] text-xs hover:border-white/20 hover:text-t1 transition-colors"
+          >
+            Copy
+          </button>
+        </div>
+      )}
+
+      {action === 'decrypt' && plaintext && (
+        <div className="mt-6">
+          <label className="block text-sm font-medium text-t2 mb-2">Plaintext</label>
+          <textarea
+            value={plaintext}
+            readOnly
+            rows={6}
+            className="w-full bg-s2 border border-white/10 rounded-[7px] px-3 py-2 text-t1 text-sm font-mono outline-none resize-none"
+          />
+          <button
+            onClick={() => copyToClipboard(plaintext)}
+            className="mt-2 border border-white/10 text-t2 px-3 py-1.5 rounded-[7px] text-xs hover:border-white/20 hover:text-t1 transition-colors"
+          >
+            Copy
+          </button>
+        </div>
+      )}
     </div>
   );
 }

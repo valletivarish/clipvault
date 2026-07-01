@@ -71,7 +71,7 @@ export default function BoardPage() {
 
   const [text, setText] = useState('');
   const [files, setFiles] = useState<FileSlot[]>([]);
-  const [expiry, setExpiry] = useState<ExpiryValue>('24h');
+  const [expiryBySlot, setExpiryBySlot] = useState<Record<number, ExpiryValue>>({});
   const [copied, setCopied] = useState(false);
   const [uploading, setUploading] = useState<Record<string, number>>({});
   const [synced, setSynced] = useState(true);
@@ -221,14 +221,14 @@ export default function BoardPage() {
     }
   };
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, slotIndex: number) => {
     if (!isEditable || !boardRef) return;
     const f = e.target.files?.[0];
     if (!f || files.length >= 3) return;
     e.target.value = '';
     if (f.size > MAX_FILE_SIZE) return;
 
-    const ms = expiryMs(expiry);
+    const ms = expiryMs(expiryBySlot[slotIndex] ?? '24h');
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     const contentType = f.type || 'application/octet-stream';
 
@@ -513,7 +513,7 @@ export default function BoardPage() {
                 >
                   <input
                     type="file"
-                    onChange={handleUpload}
+                    onChange={(e) => handleUpload(e, i)}
                     className="sr-only"
                     disabled={!isEditable || files.length >= 3}
                     aria-label="Upload file to board"
@@ -543,9 +543,9 @@ export default function BoardPage() {
                       <div className="text-[11px] text-t3">Drop any file</div>
                       <div className="text-[10px] text-t3 leading-[1.7]">PDF, image, ZIP, any</div>
                       <select
-                        value={expiry}
+                        value={expiryBySlot[i] ?? '24h'}
                         onClick={(e) => e.preventDefault()}
-                        onChange={(e) => setExpiry(e.target.value as ExpiryValue)}
+                        onChange={(e) => setExpiryBySlot((prev) => ({ ...prev, [i]: e.target.value as ExpiryValue }))}
                         className="w-full mt-auto px-2 py-[6px] bg-s3 border border-white/10 rounded-[6px] text-t2 text-[10px] appearance-none cursor-pointer"
                       >
                         <option value="1h">Expires: 1 hour</option>

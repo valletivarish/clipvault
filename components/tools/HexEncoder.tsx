@@ -82,28 +82,14 @@ export default function HexEncoder() {
       <h2 className="text-lg font-semibold text-t1 mb-6">Hex Encode / Decode</h2>
 
       <div className="mb-6">
-        <div className="flex gap-2 mb-6">
-          <button
-            onClick={() => handleModeChange('encode')}
-            className={`px-4 py-2 rounded-[7px] text-sm font-semibold transition-colors ${
-              mode === 'encode'
-                ? 'bg-ac text-white'
-                : 'border border-white/10 text-t2 hover:border-white/20 hover:text-t1'
-            }`}
-          >
-            Encode
-          </button>
-          <button
-            onClick={() => handleModeChange('decode')}
-            className={`px-4 py-2 rounded-[7px] text-sm font-semibold transition-colors ${
-              mode === 'decode'
-                ? 'bg-ac text-white'
-                : 'border border-white/10 text-t2 hover:border-white/20 hover:text-t1'
-            }`}
-          >
-            Decode
-          </button>
-        </div>
+        <select
+          value={mode}
+          onChange={(e) => handleModeChange(e.target.value as 'encode' | 'decode')}
+          className="w-full mb-6 bg-s2 border border-white/10 rounded-[7px] px-3 py-2 text-t1 text-sm font-semibold outline-none focus:border-ac/40 transition-colors"
+        >
+          <option value="encode">Encode</option>
+          <option value="decode">Decode</option>
+        </select>
 
         <div className="grid grid-cols-2 gap-6">
           <div>

@@ -142,42 +142,29 @@ export default function FileBase64() {
 
   return (
     <div className="w-full">
-      {/* Tab Switcher */}
-      <div className="flex gap-2 mb-4">
-        <button
-          onClick={() => {
-            setActiveTab('encode');
+      {/* Mode Selector */}
+      <select
+        value={activeTab}
+        onChange={(e) => {
+          const next = e.target.value as 'encode' | 'decode';
+          setActiveTab(next);
+          if (next === 'encode') {
             setFile(null);
             setFileBase64('');
             setRawBase64('');
-            setError('');
-          }}
-          className={`px-4 py-2 rounded-[7px] text-[11px] font-semibold transition-all ${
-            activeTab === 'encode'
-              ? 'bg-[#222228] text-[#FAFAFA]'
-              : 'text-[#A1A1AA] hover:text-[#FAFAFA]'
-          }`}
-        >
-          File to Base64
-        </button>
-        <button
-          onClick={() => {
-            setActiveTab('decode');
+          } else {
             setBase64Input('');
             setFilename('output.bin');
             setMimeType('application/octet-stream');
             setDecodedSize(0);
-            setError('');
-          }}
-          className={`px-4 py-2 rounded-[7px] text-[11px] font-semibold transition-all ${
-            activeTab === 'decode'
-              ? 'bg-[#222228] text-[#FAFAFA]'
-              : 'text-[#A1A1AA] hover:text-[#FAFAFA]'
-          }`}
-        >
-          Base64 to File
-        </button>
-      </div>
+          }
+          setError('');
+        }}
+        className="mb-4 bg-[#18181C] border border-white/10 rounded-[7px] px-4 py-2 text-[#FAFAFA] text-[11px] font-semibold outline-none focus:border-[#F97316]/40 transition-colors"
+      >
+        <option value="encode">Encode: File to Base64</option>
+        <option value="decode">Decode: Base64 to File</option>
+      </select>
 
       {/* Tab 1: File to Base64 */}
       {activeTab === 'encode' && (
