@@ -16,13 +16,14 @@ export default function HexEncoder() {
     }
 
     try {
-      const hex = text
-        .split('')
-        .map((c) => c.charCodeAt(0).toString(16).padStart(2, '0'))
+      const bytes = new TextEncoder().encode(text);
+      const hex = Array.from(bytes)
+        .map((b) => b.toString(16).padStart(2, '0'))
         .join(' ');
       setOutput(hex);
     } catch (err) {
       setError('Encoding failed');
+      setOutput('');
     }
   };
 
@@ -39,16 +40,17 @@ export default function HexEncoder() {
       for (const h of hexValues) {
         if (!/^[0-9a-fA-F]{2}$/.test(h)) {
           setError(`Invalid hex value: ${h}`);
+          setOutput('');
           return;
         }
       }
 
-      const text = hexValues
-        .map((h) => String.fromCharCode(parseInt(h, 16)))
-        .join('');
+      const bytes = Uint8Array.from(hexValues.map((h) => parseInt(h, 16)));
+      const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
       setOutput(text);
     } catch (err) {
       setError('Decoding failed - invalid hex format');
+      setOutput('');
     }
   };
 

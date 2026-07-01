@@ -110,7 +110,15 @@ export default function RsaCrypto() {
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-[#111115] rounded-lg border border-white/10">
-      <h1 className="text-lg font-bold text-[#FAFAFA] mb-6">RSA Encrypt Decrypt</h1>
+      <h1 className="text-lg font-bold text-[#FAFAFA] mb-3">RSA Encrypt Decrypt</h1>
+
+      <p className="text-[12px] text-[#A1A1AA] mb-6 leading-relaxed">
+        RSA uses two keys: a <span className="text-[#FAFAFA] font-semibold">public key</span> anyone can use to encrypt a message,
+        and a <span className="text-[#FAFAFA] font-semibold">private key</span> only you can use to decrypt it. Generating a pair
+        below and testing encrypt/decrypt together lets you verify the round-trip locally &mdash; in real use you'd share your
+        public key with someone else so they can send you something only you can read (paste their public key into the encrypt
+        step instead of your own), or send your public key out and keep the private key secret to receive encrypted messages back.
+      </p>
 
       {/* Key Generation Section */}
       <div className="mb-8 pb-8 border-b border-white/10">

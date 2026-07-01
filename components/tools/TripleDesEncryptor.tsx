@@ -22,10 +22,12 @@ export default function TripleDesEncryptor() {
     setError('');
     if (!plaintext.trim()) {
       setError('Plaintext cannot be empty');
+      setOutput('');
       return;
     }
     if (!keyValid) {
       setError('Key must be exactly 24 characters for Triple DES');
+      setOutput('');
       return;
     }
 
@@ -47,10 +49,12 @@ export default function TripleDesEncryptor() {
     setError('');
     if (!ciphertext.trim()) {
       setError('Ciphertext cannot be empty');
+      setOutput('');
       return;
     }
     if (!keyValid) {
       setError('Key must be exactly 24 characters for Triple DES');
+      setOutput('');
       return;
     }
 
@@ -84,7 +88,11 @@ export default function TripleDesEncryptor() {
 
         <select
           value={tab}
-          onChange={(e) => setTab(e.target.value as Tab)}
+          onChange={(e) => {
+            setTab(e.target.value as Tab);
+            setOutput('');
+            setError('');
+          }}
           className="w-full bg-[#18181C] border border-white/10 rounded-[7px] px-3 py-2 text-[#FAFAFA] text-sm font-semibold outline-none focus:border-[#F97316]/40 transition-colors"
         >
           <option value="encrypt">Encrypt</option>

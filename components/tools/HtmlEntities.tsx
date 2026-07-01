@@ -13,26 +13,35 @@ function encodeHtml(text: string): string {
     .replace(/'/g, '&#39;');
 }
 
+const NAMED_ENTITIES: Record<string, string> = {
+  '&amp;': '&',
+  '&lt;': '<',
+  '&gt;': '>',
+  '&quot;': '"',
+  '&#39;': "'",
+  '&#x27;': "'",
+  '&apos;': "'",
+  '&nbsp;': '\u00a0',
+  '&copy;': '©',
+  '&reg;': '®',
+  '&trade;': '™',
+  '&mdash;': '—',
+  '&ndash;': '–',
+  '&hellip;': '…',
+  '&laquo;': '«',
+  '&raquo;': '»',
+};
+
+// Single combined pass so chained entities (e.g. "&amp;lt;") are only
+// unescaped once instead of being decoded again on each subsequent pass.
+const ENTITY_PATTERN = /&#x([0-9a-fA-F]+);|&#(\d+);|&[a-zA-Z0-9]+;/g;
+
 function decodeHtml(text: string): string {
-  return text
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&#x27;/g, "'")
-    .replace(/&apos;/g, "'")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&copy;/g, '©')
-    .replace(/&reg;/g, '®')
-    .replace(/&trade;/g, '™')
-    .replace(/&mdash;/g, '—')
-    .replace(/&ndash;/g, '–')
-    .replace(/&hellip;/g, '…')
-    .replace(/&laquo;/g, '«')
-    .replace(/&raquo;/g, '»');
+  return text.replace(ENTITY_PATTERN, (match, hex, dec) => {
+    if (hex !== undefined) return String.fromCharCode(parseInt(hex, 16));
+    if (dec !== undefined) return String.fromCharCode(Number(dec));
+    return NAMED_ENTITIES[match] ?? match;
+  });
 }
 
 export default function HtmlEntities() {

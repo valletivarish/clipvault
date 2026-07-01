@@ -36,6 +36,7 @@ export default function AesEncryptor() {
     setError('');
     if (!plaintext.trim() || !secretKey.trim()) {
       setError('Please enter both plaintext and secret key');
+      setCiphertext('');
       return;
     }
     try {
@@ -44,6 +45,7 @@ export default function AesEncryptor() {
       setCiphertext(encrypted.toString());
     } catch {
       setError('Encryption failed');
+      setCiphertext('');
     }
   };
 
@@ -51,6 +53,7 @@ export default function AesEncryptor() {
     setError('');
     if (!ciphertext.trim() || !secretKey.trim()) {
       setError('Please enter both ciphertext and secret key');
+      setPlaintext('');
       return;
     }
     try {
@@ -58,11 +61,13 @@ export default function AesEncryptor() {
       const decrypted = CryptoJS.AES.decrypt(ciphertext, keyWA, opts).toString(CryptoJS.enc.Utf8);
       if (!decrypted) {
         setError('Decryption failed - wrong key, IV, or corrupted data');
+        setPlaintext('');
         return;
       }
       setPlaintext(decrypted);
     } catch {
       setError('Decryption failed - wrong key, IV, or corrupted data');
+      setPlaintext('');
     }
   };
 
@@ -76,7 +81,10 @@ export default function AesEncryptor() {
 
       <select
         value={action}
-        onChange={(e) => setAction(e.target.value as 'encrypt' | 'decrypt')}
+        onChange={(e) => {
+          setAction(e.target.value as 'encrypt' | 'decrypt');
+          setError('');
+        }}
         className="w-full mb-6 bg-s2 border border-white/10 rounded-[7px] px-3 py-2 text-t1 text-sm font-semibold outline-none focus:border-ac/40 transition-colors"
       >
         <option value="encrypt">Encrypt</option>

@@ -12,7 +12,16 @@ export default function Base64Encoder() {
     setInput(text);
     try {
       setError('');
-      setOutput(btoa(text));
+      if (!text) {
+        setOutput('');
+        return;
+      }
+      const bytes = new TextEncoder().encode(text);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      setOutput(btoa(binary));
     } catch (err) {
       setError('Encoding failed');
       setOutput('');
@@ -23,7 +32,13 @@ export default function Base64Encoder() {
     setInput(text);
     try {
       setError('');
-      setOutput(atob(text));
+      if (!text) {
+        setOutput('');
+        return;
+      }
+      const binary = atob(text);
+      const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+      setOutput(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
     } catch (err) {
       setError('Invalid Base64');
       setOutput('');

@@ -429,15 +429,24 @@ export default function BoardPage() {
                 <div className={`w-[4px] h-[4px] rounded-full bg-ok ${synced ? '' : 'opacity-40'}`} />
                 {synced ? 'synced' : 'syncing...'}
               </div>
-              <textarea
-                value={text}
-                onChange={(e) => handleTextChange(e.target.value.slice(0, 65000))}
-                readOnly={!isEditable}
-                placeholder={isEditable ? 'Start typing - changes sync to all connected devices instantly' : 'Board is locked. Click Unlock to edit.'}
-                aria-label="Shared board text"
-                maxLength={65000}
-                className={`w-full bg-transparent outline-none resize-y text-t1 text-[13px] leading-relaxed pr-20 min-h-[180px] max-h-[70vh] overflow-y-auto ${!isEditable ? 'cursor-not-allowed opacity-60' : ''}`}
-              />
+              {connected ? (
+                <textarea
+                  value={text}
+                  onChange={(e) => handleTextChange(e.target.value.slice(0, 65000))}
+                  readOnly={!isEditable}
+                  placeholder={isEditable ? 'Start typing - changes sync to all connected devices instantly' : 'Board is locked. Click Unlock to edit.'}
+                  aria-label="Shared board text"
+                  maxLength={65000}
+                  className={`w-full bg-transparent outline-none resize-y text-t1 text-[13px] leading-relaxed pr-20 min-h-[180px] max-h-[70vh] overflow-y-auto ${!isEditable ? 'cursor-not-allowed opacity-60' : ''}`}
+                />
+              ) : (
+                <div className="min-h-[180px] space-y-3.5 pt-1" aria-hidden="true">
+                  <div className="h-3.5 w-[68%] rounded-[4px] skeleton" />
+                  <div className="h-3.5 w-[42%] rounded-[4px] skeleton" />
+                  <div className="h-3.5 w-[57%] rounded-[4px] skeleton" />
+                  <div className="h-3.5 w-[30%] rounded-[4px] skeleton" />
+                </div>
+              )}
             </div>
             <div className="flex items-center justify-between px-5 py-[10px] border-t border-white/[0.06]">
               <span className={`text-[11px] font-mono ${text.length >= 65000 ? 'text-danger' : text.length > 60000 ? 'text-warn' : 'text-t3'}`}>
@@ -460,7 +469,20 @@ export default function BoardPage() {
             Files - any type, 25 MB max, expiry per file
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-[10px]">
-            {displaySlots.map((slot, i) => {
+            {!connected
+              ? [0, 1, 2].map((i) => (
+                  <div
+                    key={`sk-${i}`}
+                    className="bg-s1 border border-white/[0.06] rounded-xl shadow-card p-5 flex flex-col items-center gap-3 min-h-[148px]"
+                    aria-hidden="true"
+                  >
+                    <div className="w-8 h-8 rounded-lg skeleton mt-2" />
+                    <div className="h-3 w-24 rounded-[4px] skeleton mt-1" />
+                    <div className="h-2.5 w-32 rounded-[4px] skeleton" />
+                    <div className="h-7 w-full rounded-[8px] skeleton mt-auto" />
+                  </div>
+                ))
+              : displaySlots.map((slot, i) => {
               if (slot) {
                 const label = expiryLabel(slot.expiresAt);
                 const isWarn = label !== 'never' && !label.startsWith('7d') && !label.startsWith('30d');

@@ -57,6 +57,7 @@ export default function JasyptEncryptor() {
     setError('');
     if (!plaintext.trim() || !password.trim()) {
       setError('Please enter both plaintext and password');
+      setCiphertext('');
       return;
     }
 
@@ -75,6 +76,7 @@ export default function JasyptEncryptor() {
     setError('');
     if (!ciphertext.trim() || !decryptPassword.trim()) {
       setError('Please enter both ciphertext and password');
+      setDecryptResult('');
       return;
     }
 
@@ -82,6 +84,7 @@ export default function JasyptEncryptor() {
       const result = jasyptDecrypt(ciphertext, decryptPassword);
       if (!result) {
         setError('Decryption failed - invalid password or corrupted data');
+        setDecryptResult('');
         return;
       }
       setDecryptResult(result);
@@ -109,7 +112,11 @@ export default function JasyptEncryptor() {
       {/* Mode Selector */}
       <select
         value={action}
-        onChange={(e) => setAction(e.target.value as 'encrypt' | 'decrypt')}
+        onChange={(e) => {
+          setAction(e.target.value as 'encrypt' | 'decrypt');
+          setError('');
+          setDecryptResult('');
+        }}
         className="mb-6 w-full bg-[#18181C] border border-white/10 rounded-[7px] px-3 py-2 text-[#FAFAFA] text-sm font-semibold outline-none focus:border-[#F97316]/40 transition-colors"
       >
         <option value="encrypt">Encrypt</option>
