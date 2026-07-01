@@ -10,17 +10,25 @@ interface AdUnitProps {
 
 const PUB_ID = 'ca-pub-1337359381374895';
 
+// Slot IDs below are still placeholders (no real ad units created yet in
+// AdSense). Rendering the real <ins> tag with a fake slot shows broken/empty
+// ad space, which looks worse during site review than showing nothing.
+// Flip this to true once real per-placement ad units exist.
+const ADS_ENABLED = false;
+
 export default function AdUnit({ slot, format = 'auto', className = '' }: AdUnitProps) {
   const ref = useRef<HTMLModElement>(null);
   const pushed = useRef(false);
 
   useEffect(() => {
-    if (pushed.current) return;
+    if (!ADS_ENABLED || pushed.current) return;
     try {
       pushed.current = true;
       ((window as unknown as Record<string, unknown>).adsbygoogle as unknown[] ?? []).push({});
     } catch {}
   }, []);
+
+  if (!ADS_ENABLED) return null;
 
   return (
     <div className={className}>

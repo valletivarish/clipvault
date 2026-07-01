@@ -20,11 +20,6 @@ export default function Home() {
       <Nav />
       <HeroSection />
 
-      {/* Ad strip */}
-      <div className="border-y border-white/[0.06] py-[9px] text-center text-[10px] text-t3 tracking-[0.04em]">
-        Advertisement
-      </div>
-
       <HomeToolsSection />
       <Footer />
     </div>

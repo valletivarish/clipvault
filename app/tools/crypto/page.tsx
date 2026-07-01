@@ -57,11 +57,6 @@ export default function CryptoToolsPage() {
     <div className="min-h-screen flex flex-col bg-[#09090B] text-[#FAFAFA]">
       <Nav />
 
-      {/* Ad placeholder */}
-      <div className="px-7 py-[9px] border-b border-white/[0.06] text-center text-[10px] text-[#52525B] tracking-[0.04em]">
-        Advertisement
-      </div>
-
       {/* Content area */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
