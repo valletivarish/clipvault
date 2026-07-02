@@ -57,6 +57,8 @@ export const TOOLS: ToolMeta[] = [
   { name: 'PDF Merge', slug: 'pdf-merge', description: 'Merge multiple PDF files into one in your browser. Reorder pages, no upload required.', category: 'PDF', keywords: ['merge pdf online', 'combine pdf files', 'pdf merger free', 'join pdf'] },
   { name: 'Word Viewer', slug: 'word-viewer', description: 'Open and read .docx Word documents in your browser. No Microsoft Office needed. Export as HTML.', category: 'Documents', keywords: ['word viewer online', 'docx viewer', 'open word file online', 'view docx without word'] },
   { name: 'Excel Viewer', slug: 'excel-viewer', description: 'Open and view .xlsx, .xls, and .csv spreadsheets in your browser. Download as CSV or XLSX.', category: 'Documents', keywords: ['excel viewer online', 'xlsx viewer', 'open excel file online', 'view spreadsheet online'] },
+  { name: 'PDF to Base64', slug: 'pdf-to-base64', description: 'Convert a PDF file to a Base64 string or data URI. No upload required.', category: 'PDF', keywords: ['pdf to base64', 'pdf base64 converter', 'convert pdf to base64 online'] },
+  { name: 'Base64 to PDF', slug: 'base64-to-pdf', description: 'Decode a Base64 string back into a downloadable PDF file, with preview.', category: 'PDF', keywords: ['base64 to pdf', 'base64 pdf converter', 'decode base64 to pdf'] },
 ]
 
 // Build Next.js Metadata object for a page

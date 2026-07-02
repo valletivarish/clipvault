@@ -50,6 +50,8 @@ import PasswordStrength from '@/components/tools/PasswordStrength';
 import PdfMerge from '@/components/tools/PdfMerge';
 import WordViewer from '@/components/tools/WordViewer';
 import ExcelViewer from '@/components/tools/ExcelViewer';
+import PdfToBase64 from '@/components/tools/PdfToBase64';
+import Base64ToPdf from '@/components/tools/Base64ToPdf';
 
 const COMPONENTS: Record<string, React.ComponentType> = {
   'qr': QrGenerator,
@@ -96,6 +98,8 @@ const COMPONENTS: Record<string, React.ComponentType> = {
   'pdf-merge': PdfMerge,
   'word-viewer': WordViewer,
   'excel-viewer': ExcelViewer,
+  'pdf-to-base64': PdfToBase64,
+  'base64-to-pdf': Base64ToPdf,
 };
 
 export async function generateStaticParams() {
